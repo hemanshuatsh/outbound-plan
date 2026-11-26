@@ -462,13 +462,19 @@ table.leads td:nth-child(2) b, table.leads td:nth-child(2) small, table.leads td
 /* ---------- Floating navigation: Back / Next always visible ---------- */
 .screen .nav-row {
   position: sticky; bottom: 0; z-index: 20;
-  margin-top: 28px; padding: 14px 0; border-top: 1px solid var(--line);
-  background: rgba(255, 255, 255, .94); backdrop-filter: blur(8px);
-  box-shadow: 0 -10px 24px -18px rgba(11, 11, 11, .25);
+  margin-top: 28px; padding: 14px 0; border-top: 0; background: none;
 }
+/* full-width bar behind the buttons, so there are no visible edges */
+/* box-shadow + clip-path paint edge to edge without widening the page */
+.screen .nav-row::before, .screen .nav-row::after { content: ""; position: absolute; left: 0; right: 0; z-index: -1; clip-path: inset(0 -100vmax); }
+.screen .nav-row::before { top: 0; bottom: 0; background: rgba(255, 255, 255, .96); box-shadow: 0 0 0 100vmax rgba(255, 255, 255, .96); }
+.screen .nav-row::after { top: 0; height: 1px; background: var(--line); box-shadow: 0 0 0 100vmax var(--line); }
 @media (max-width: 600px) {
-  .screen .nav-row { padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); margin-left: -16px; margin-right: -16px; padding-left: 16px; padding-right: 16px; }
+  .screen .nav-row { padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); }
 }
+/* table scroll area fades at the bottom instead of cutting a row in half */
+.leads-scroll { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 56px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 56px), transparent); }
+.leads-note { position: relative; z-index: 1; }
 
 /* ---------- Company branding ---------- */
 .with-mark { display: flex; align-items: center; gap: 14px; }
@@ -499,3 +505,35 @@ table.leads td:nth-child(2) b, table.leads td:nth-child(2) small, table.leads td
   .plan-card .wa-panel { max-width: none; }
   .with-mark { gap: 10px; }
 }
+
+/* ---------- Live logo preview while typing the website ---------- */
+.hero-form .pre { width: 40px; height: 40px; place-items: center; border-radius: 10px; transition: background .2s; }
+.hero-form .pre.has-logo { background: #fff; border: 1px solid var(--line-2); }
+.hero-form .pre img { width: 26px; height: 26px; object-fit: contain; animation: pop .3s ease both; }
+@keyframes pop { from { transform: scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
+.url-preview { display: flex; justify-content: center; align-items: center; gap: 8px; min-height: 28px; margin-top: 12px; font-size: 15px; color: var(--muted); opacity: 0; transition: opacity .2s; }
+.url-preview.show { opacity: 1; }
+.url-preview img { width: 22px; height: 22px; object-fit: contain; border-radius: 5px; }
+.url-preview b { color: var(--ink); font-weight: 600; }
+.url-preview .i { color: var(--muted); }
+.url-preview .spin { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--line-2); border-top-color: var(--primary); animation: spin .7s linear infinite; }
+@media (max-width: 600px) { .hero-form .pre { display: none; } .url-preview { flex-wrap: wrap; } }
+
+/* ---------- 5-step funnel: reach → replies → positive → meetings → clients ---------- */
+.journey.j5 { grid-template-columns: repeat(5, 1fr); gap: 12px; }
+.journey.j5 .jstep { padding: 18px; }
+.journey.j5 .jstep + .jstep::before { left: -12px; width: 12px; }
+.journey.j5 .jstep .v { font-size: clamp(26px, 2.6vw, 38px); margin: 16px 0 6px; white-space: nowrap; }
+.journey.j5 .jstep .k { font-size: 16px; }
+.journey.j5 .jstep.pos { background: #fff6ef; border-color: #ffe0c7; }
+.journey.j5 .jstep.pos .v { color: #c2410c; }
+.journey.j5 .jstep.pos .jic { background: #ffe9d8; color: #c2410c; }
+.journey.j5 .jstep.win { background: var(--green-50); border-color: #bfe6cd; color: var(--ink); }
+.journey.j5 .jstep.win .v { color: var(--green); }
+.journey.j5 .jstep.win .jn { background: #fff; border-color: #bfe6cd; color: var(--green); }
+.journey.j5 .jstep.win .jic { background: #d4f1df; color: var(--green); }
+.journey.j5 .jstep.win p { color: var(--muted); }
+.j-est { margin: 10px 2px 0; font-size: 13px; color: var(--muted-2); }
+@media (max-width: 1100px) { .journey.j5 { grid-template-columns: repeat(3, 1fr); } .journey.j5 .jstep + .jstep::before { display: none; } }
+@media (max-width: 760px) { .journey.j5 { grid-template-columns: 1fr 1fr; } .journey.j5 .jstep.win { grid-column: 1 / -1; } }
+@media (max-width: 600px) { .journey.j5 { grid-template-columns: 1fr; } }

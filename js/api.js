@@ -234,18 +234,26 @@ window.SH_API = (function () {
     return `${LF.baseUrl}?${q.toString().replace(/\+/g, "%20")}`;
   }
 
-  // Simple, honest funnel: prospects reached → 3–5% reply → 0.5–1% book a meeting.
+  // Funnel: prospects reached → ~1.5–2.5% reply → ~20% positive → ~80% meet → ~50% become clients.
   // Value is shown in meetings and time saved; pipeline only if the visitor picks a deal size.
   function outreach({ prospects }) {
     const B = C.benchmarks;
     const emails = prospects * B.emailsPerProspect;
-    const range = ([lo, hi]) => [Math.round(prospects * lo), Math.round(prospects * hi)];
+    const repliesRaw = B.replyRateRange.map((r) => prospects * r);
+    const positiveRaw = repliesRaw.map((x) => x * B.positiveShare);
+    const meetingsRaw = positiveRaw.map((x) => x * B.meetingShare);
+    const clientsRaw = meetingsRaw.map((x) => x * B.clientShare);
+    const round = (pair) => pair.map((x) => Math.max(1, Math.round(x)));
     const hours = Math.round((emails * B.minutesPerEmail) / 60);
     const infra = infraPlan({ prospects, channels: {} });
+    const meetings = round(meetingsRaw);
     return {
       prospects, emails,
-      replies: range(B.replyRateRange),
-      positive: range(B.meetingRateRange), // meetings booked
+      replies: round(repliesRaw),
+      positiveReplies: round(positiveRaw),
+      meetings,
+      clients: round(clientsRaw),
+      positive: meetings, // kept for older callers: meetings booked
       hours,
       sdrs: hours / B.sdrHoursPerMonth,
       emailsPerDay: infra.emailsPerDay,
@@ -313,6 +321,7 @@ window.SH_API = (function () {
 
   return {
     SEQUENCE, channelPlan, encodePlan, decodePlan,
+    prettyName: (domain) => prettyCompanyName(cleanDomain(domain)),
     leadFinderUrl, outreach,
     looksLikeDomain, cleanDomain, industryById,
     analyzeWebsite, getMarketSize, getSampleLeads, forecast, infraPlan, draftFirstEmail,

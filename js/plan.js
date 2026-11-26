@@ -83,12 +83,14 @@
             <div><span class="eyebrow">1 · The value</span><h2 class="pl-h2">What this can bring in every month</h2></div>
             <div class="pills" id="volume" title="New leads per month">${B.volumeOptions.map((v) => `<button data-v="${v}" class="${S.prospects === v ? "on" : ""}">${fmtInt(v)}</button>`).join("")}</div>
           </div>
-          <div class="journey">
-            <div class="jstep"><div class="jtop"><span class="jn">1</span><span class="jic">${I("database", 18)}</span></div><div class="v num">${fmtInt(o.prospects)}</div><div class="k">Leads you get</div><p>Decision makers from Lead Finder</p></div>
-            <div class="jstep"><div class="jtop"><span class="jn">2</span><span class="jic">${I("send", 18)}</span></div><div class="v num">${fmtInt(o.prospects)}</div><div class="k">Prospects you reach</div><p>About ${fmtInt(o.prospectsPerDay)} a day, by email, LinkedIn and calls</p></div>
-            <div class="jstep"><div class="jtop"><span class="jn">3</span><span class="jic">${I("message", 18)}</span></div><div class="v num">${rng(o.replies)}</div><div class="k">Replies</div><p>About ${pct(B.replyRateRange[0])}–${pct(B.replyRateRange[1])} of prospects write back</p></div>
-            <div class="jstep win"><div class="jtop"><span class="jn">4</span><span class="jic">${I("calendar", 18)}</span></div><div class="v num">${rng(o.positive)}</div><div class="k">Meetings booked</div><p>About ${pct(B.meetingRateRange[0])}–${pct(B.meetingRateRange[1])} of prospects book a call</p></div>
+          <div class="journey j5">
+            <div class="jstep"><div class="jtop"><span class="jn">1</span><span class="jic">${I("send", 18)}</span></div><div class="v num">${fmtInt(o.prospects)}</div><div class="k">Leads you reach</div><p>Fresh decision makers from Lead Finder, about ${fmtInt(o.prospectsPerDay)} a day</p></div>
+            <div class="jstep"><div class="jtop"><span class="jn">2</span><span class="jic">${I("message", 18)}</span></div><div class="v num">~${rng(o.replies)}</div><div class="k">Replies</div><p>~${pct(B.replyRateRange[0])}–${pct(B.replyRateRange[1])} of people reply</p></div>
+            <div class="jstep pos"><div class="jtop"><span class="jn">3</span><span class="jic">${I("sparkles", 18)}</span></div><div class="v num">~${rng(o.positiveReplies)}</div><div class="k">Positive replies</div><p>~${Math.round(B.positiveShare * 100)}% of replies want to talk</p></div>
+            <div class="jstep"><div class="jtop"><span class="jn">4</span><span class="jic">${I("calendar", 18)}</span></div><div class="v num">~${rng(o.meetings)}</div><div class="k">Meetings</div><p>~${Math.round(B.meetingShare * 100)}% book a meeting</p></div>
+            <div class="jstep win"><div class="jtop"><span class="jn">5</span><span class="jic">${I("trendingUp", 18)}</span></div><div class="v num">~${rng(o.clients)}</div><div class="k">New clients</div><p>~${Math.round(B.clientShare * 100)}% of meetings become clients</p></div>
           </div>
+          <p class="j-est">Estimate: ~${pct(B.replyRateRange[0])} to ${pct(B.replyRateRange[1])} reply, ~${Math.round(B.positiveShare * 100)}% positive, ~${Math.round(B.meetingShare * 100)}% meet, ~${Math.round(B.clientShare * 100)}% buy. Yours can be better.</p>
           <div class="pl-note">${I("clock", 16)} <span>Saves about <b>${fmtInt(o.hours)} hours</b> of manual prospecting a month, the work of <b>${oneDp(o.sdrs)} full-time reps</b>.</span></div>
         </div>
 
@@ -125,7 +127,7 @@
             ${chan("email", "Email", "Main channel", `AI-personalised emails from ${o.mailboxes} warmed-up mailboxes, sent automatically.`, "Day 1, 4 & 11", `${fmtInt(o.prospects)} prospects, ${B.emailsPerProspect} emails each`)}
             ${chan("linkedin", "LinkedIn", "Warm-up touch", "Connect with best-fit decision makers so the name is familiar before the follow-up.", "Day 2, message on Day 8", `${fmtInt(cp.linkedin)} requests / month`)}
             ${chan("call", "Calls", "Built-in dialer", "Call the prospects who opened or clicked. Warm calls, not cold ones.", "Day 6", `~${cp.callsDay} calls a day`)}
-            ${chan("whatsapp", "WhatsApp", "Close the loop", "Confirm meetings with interested prospects, faster.", "Day 14, or on reply", `${rng(o.positive)} conversations / month`)}
+            ${chan("whatsapp", "WhatsApp", "Close the loop", "Confirm meetings with interested prospects, faster.", "Day 14, or on reply", `~${rng(o.positiveReplies)} conversations / month`)}
           </div>
           <div class="card" style="margin-top:14px"><div class="seq">${seq.map((s) => `<div class="seq-step"><div class="dot c-${s.ch}">${I(CH_ICON[s.ch], 18)}</div><div class="day">Day ${s.day}</div><div class="what">${esc(s.what)}</div></div>`).join("")}</div></div>
           <div class="card disclosure ${S.emailOpen ? "open" : ""}" style="margin-top:14px">

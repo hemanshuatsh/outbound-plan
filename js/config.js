@@ -40,14 +40,16 @@ window.SH_CONFIG = {
   // Keep these conservative and cite them on screen; they drive the forecast.
   benchmarks: {
     // ---- Results screen (simple email funnel, shown as ranges) ----
-    // Shares of PROSPECTS reached (not emails sent), so numbers stay realistic.
-    replyRateRange: [0.03, 0.05],      // 3–5% of prospects reply across the sequence (Hunter 2025: 4.5% avg)
-    meetingRateRange: [0.005, 0.01],   // 0.5–1% of prospects book a meeting
-    volumeOptions: [500, 1000, 2000, 5000], // prospects per month the visitor can pick
-    defaultProspects: 2000,
+    // Outbound funnel (per month), shown as ranges:
+    // people reached → ~1.5–2.5% reply → ~20% of replies positive → ~80% book a meeting → ~50% become clients
+    replyRateRange: [0.015, 0.025],
+    positiveShare: 0.2,
+    meetingShare: 0.8,
+    clientShare: 0.5,
+    volumeOptions: [1000, 2000, 5000, 10000, 20000], // prospects per month the visitor can pick
+    defaultProspects: 5000,
     minutesPerEmail: 4,                // manual research + writing + sending per personalised email
     sdrHoursPerMonth: 160,             // one full-time SDR
-    closeRate: 0.2,                    // 1 in 5 meetings becomes a deal (for 'what it could be worth')
     // ---- Older multichannel model (kept for reference) ----
     emailReplyRate: 0.045,    // Hunter "State of Cold Email 2025" & Saleshandy 30M-email study: ~4.5% avg
     linkedinReplyRate: 0.082,  // Belkins LinkedIn study: 8.2% reply on connection requests with a note
