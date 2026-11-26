@@ -458,3 +458,14 @@ table.leads td:nth-child(2) b, table.leads td:nth-child(2) small, table.leads td
   table.leads .domain { display: block; max-width: 150px; overflow: hidden; text-overflow: ellipsis; }
   table.leads td:nth-child(2) b { white-space: normal; }
 }
+
+/* ---------- Floating navigation: Back / Next always visible ---------- */
+.screen .nav-row {
+  position: sticky; bottom: 0; z-index: 20;
+  margin-top: 28px; padding: 14px 0; border-top: 1px solid var(--line);
+  background: rgba(255, 255, 255, .94); backdrop-filter: blur(8px);
+  box-shadow: 0 -10px 24px -18px rgba(11, 11, 11, .25);
+}
+@media (max-width: 600px) {
+  .screen .nav-row { padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); margin-left: -16px; margin-right: -16px; padding-left: 16px; padding-right: 16px; }
+}

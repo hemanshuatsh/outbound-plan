@@ -22,7 +22,7 @@ window.SH_CONFIG = {
     // Public address where plan.html is hosted (e.g. "https://plan.saleshandy.com/plan.html").
     // Visitors' phones open this from the QR, so it must be reachable on the internet.
     // Leave empty to use the address this page is served from (fine for local testing only).
-    planBaseUrl: "",
+    planBaseUrl: "https://hemanshuatsh.github.io/outbound-plan/plan.html",
   },
 
   // Optional: POST captured booth leads to a webhook (n8n / Zapier / Sheets).

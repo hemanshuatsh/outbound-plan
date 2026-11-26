@@ -17,9 +17,25 @@
   .pl-actions-top .btn, .pl-head-row .btn, .pl-final .btn-lg { width: 100%; }
   .pl-section { margin-top: 32px; padding-top: 26px; }
 }
+.pl-title-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 16px; }
+.pl-title-row .pl-h2 { margin: 0; }
+.pl-note { margin-top: 14px; display: flex; gap: 10px; align-items: center; padding: 14px 16px; border-radius: 12px; background: var(--surface); font-size: 15px; color: var(--ink-2); }
+.pl-note .i { color: var(--primary); }
+.pl-market { display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 14px; }
+.pl-kpi { padding: 22px; border-radius: 18px; background: var(--surface); border: 1px solid var(--line); display: flex; flex-direction: column; justify-content: space-between; gap: 14px; }
+.pl-kpi span { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 500; color: var(--muted); }
+.pl-kpi b { font-size: clamp(30px, 3.4vw, 42px); font-weight: 700; letter-spacing: -.035em; line-height: 1; }
+.pl-kpi.blue { background: var(--primary); border-color: var(--primary); color: #fff; }
+.pl-kpi.blue span { color: #dfe6ff; }
+.pl-icp { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; padding: 20px 22px; border-radius: 18px; border: 1px solid var(--line); background: #fff; }
+.pl-icp small { display: block; font-size: 12px; font-weight: 600; color: var(--muted-2); text-transform: uppercase; letter-spacing: .05em; }
+.pl-icp b { display: block; margin-top: 3px; font-size: 15px; font-weight: 600; line-height: 1.35; }
+@media (max-width: 900px) { .pl-market { grid-template-columns: 1fr 1fr; } .pl-icp { grid-column: 1 / -1; } }
+@media (max-width: 600px) { .pl-icp { grid-template-columns: 1fr; } .pl-final .btn-lg { width: 100%; } }
+
 /* Print / Save as PDF */
 @media print {
-  .plan-page .topbar, .pl-actions-top, .volume, #top-cta, .pl-head-row .btn { display: none !important; }
+  .plan-page .topbar, .pl-actions-top, #volume, #top-cta { display: none !important; }
   .plan-page .leads-scroll { max-height: none; overflow: visible; }
   .plan-page .card, .jstep, .chan, .tl { break-inside: avoid; box-shadow: none; }
   .plan-page .screen { padding: 0; animation: none; }
