@@ -234,18 +234,18 @@ window.SH_API = (function () {
     return `${LF.baseUrl}?${q.toString().replace(/\+/g, "%20")}`;
   }
 
-  // Simple, honest email funnel: emails sent → 3–4% replies → 1–2% interested/meetings.
+  // Simple, honest funnel: prospects reached → 3–5% reply → 0.5–1% book a meeting.
   // Value is shown in meetings and time saved; pipeline only if the visitor picks a deal size.
   function outreach({ prospects }) {
     const B = C.benchmarks;
     const emails = prospects * B.emailsPerProspect;
-    const range = ([lo, hi]) => [Math.round(emails * lo), Math.round(emails * hi)];
+    const range = ([lo, hi]) => [Math.round(prospects * lo), Math.round(prospects * hi)];
     const hours = Math.round((emails * B.minutesPerEmail) / 60);
     const infra = infraPlan({ prospects, channels: {} });
     return {
       prospects, emails,
       replies: range(B.replyRateRange),
-      positive: range(B.positiveRateRange),
+      positive: range(B.meetingRateRange), // meetings booked
       hours,
       sdrs: hours / B.sdrHoursPerMonth,
       emailsPerDay: infra.emailsPerDay,
@@ -286,6 +286,7 @@ window.SH_API = (function () {
     q.set("t", profile.titles.map((t) => ind.titles.indexOf(t)).filter((x) => x >= 0).join("."));
     q.set("p", String(prospects));
     if (market) q.set("m", `${market.contacts}.${market.companies}`);
+    if (profile.brandColor) q.set("k", profile.brandColor.replace("#", ""));
     return q.toString();
   }
   function decodePlan(str) {
@@ -297,11 +298,13 @@ window.SH_API = (function () {
     const sizes = pickList(q.get("s"), D.sizes.map((s) => s.id));
     const titles = (q.get("t") || "").split(".").map(Number).filter((n) => ind.titles[n]).map((n) => ind.titles[n]);
     const [contacts, companies] = (q.get("m") || "").split(".").map(Number);
+    const k = (q.get("k") || "").toLowerCase();
     return {
       profile: {
         companyName: q.get("c") || "", domain: q.get("d") || "", industryId: ind.id, offering: ind.offering,
         geos: geos.length ? geos : ind.defaultGeos.slice(), sizes: sizes.length ? sizes : D.defaultSizes.slice(),
         titles: titles.length ? titles : ind.titles.slice(),
+        brandColor: /^[0-9a-f]{6}$/.test(k) ? "#" + k : "",
       },
       prospects: Number(q.get("p")) || C.benchmarks.defaultProspects,
       market: contacts ? { contacts, companies } : null,

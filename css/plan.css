@@ -33,6 +33,13 @@
 @media (max-width: 900px) { .pl-market { grid-template-columns: 1fr 1fr; } .pl-icp { grid-column: 1 / -1; } }
 @media (max-width: 600px) { .pl-icp { grid-template-columns: 1fr; } .pl-final .btn-lg { width: 100%; } }
 
+.pl-lockup { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+.pl-lockup .x { font-size: 20px; color: var(--muted-2); }
+.brand-mark.sh img { width: 60%; height: 60%; }
+.pl-hero.branded { position: relative; }
+.pl-hero.branded::before { content: ""; position: absolute; inset: -40px -24px auto; height: 220px; background: linear-gradient(180deg, color-mix(in srgb, var(--brand) 14%, transparent), transparent); border-radius: 0 0 28px 28px; z-index: -1; }
+.pl-hero.branded .pl-lockup .brand-mark:first-child { border-color: color-mix(in srgb, var(--brand) 45%, transparent); }
+
 /* Print / Save as PDF */
 @media print {
   .plan-page .topbar, .pl-actions-top, #volume, #top-cta { display: none !important; }

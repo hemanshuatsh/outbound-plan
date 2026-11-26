@@ -15,6 +15,7 @@
   const rng = ([a, b]) => `${fmtInt(a)}–${fmtInt(b)}`;
   const oneDp = (x) => x.toFixed(1).replace(/\.0$/, "");
   const listJoin = (a) => (a.length <= 1 ? a[0] || "" : a.slice(0, -1).join(", ") + " & " + a[a.length - 1]);
+  const pct = (x) => (x * 100).toFixed(1).replace(/\.0$/, "") + "%";
   const initials = (n) => n.split(" ").map((x) => x[0]).join("").slice(0, 2).toUpperCase();
   const AV = [["#f1f5ff", "#275df5"], ["#ecf8f0", "#1b7f3b"], ["#fff1e6", "#c2410c"], ["#f4efff", "#7c3aed"], ["#fff8d6", "#8a6d00"]];
   const CH_ICON = { email: "mail", linkedin: "linkedinFill", call: "phone", whatsapp: "whatsappFill" };
@@ -34,6 +35,13 @@
   const geoNames = p.geos.map((g) => D.geos.find((x) => x.id === g)?.name);
   const lfUrl = API.leadFinderUrl(p);
   const title = `${p.companyName ? p.companyName + "'s" : "Your"} 30-day outbound plan`;
+  if (p.brandColor) document.documentElement.style.setProperty("--brand", p.brandColor);
+  const logoSrc = p.domain ? `https://www.google.com/s2/favicons?domain=${encodeURIComponent(p.domain)}&sz=128` : "";
+  function brandMark() {
+    const mono = `<span class="brand-mark mono" style="width:56px;height:56px;${p.brandColor ? `background:${p.brandColor}` : ""}">${esc(initials(p.companyName || "Your"))}</span>`;
+    if (!logoSrc) return mono;
+    return `<span class="brand-mark" style="width:56px;height:56px"><img src="${esc(logoSrc)}" alt="${esc(p.companyName)} logo" onload="if(this.naturalWidth<32)this.parentNode.outerHTML=this.parentNode.dataset.mono" onerror="this.parentNode.outerHTML=this.parentNode.dataset.mono" /></span>`.replace('class="brand-mark"', `class="brand-mark" data-mono='${mono.replace(/'/g, "&#39;")}'`);
+  }
   document.title = title;
   function sizeRange() {
     const order = D.sizes.map((s) => s.id).filter((id) => p.sizes.includes(id));
@@ -59,7 +67,8 @@
       </div>`;
     root.innerHTML = `
       <section class="screen plan-wrap">
-        <div class="pl-hero">
+        <div class="pl-hero ${p.brandColor ? "branded" : ""}">
+          <div class="pl-lockup">${brandMark()}<span class="x">×</span><span class="brand-mark sh" style="width:56px;height:56px"><img src="assets/favicon.svg" alt="Saleshandy" /></span></div>
           <span class="eyebrow">${I("sparkles", 13)} Built with Saleshandy at ${esc(C.event.name)}</span>
           <h1>${esc(title)}</h1>
           <p class="sub">A multichannel outbound plan for ${esc(ind.name)}: who to reach, what it can bring in, and how it runs.</p>
@@ -75,10 +84,10 @@
             <div class="pills" id="volume" title="New leads per month">${B.volumeOptions.map((v) => `<button data-v="${v}" class="${S.prospects === v ? "on" : ""}">${fmtInt(v)}</button>`).join("")}</div>
           </div>
           <div class="journey">
-            <div class="jstep"><div class="jtop"><span class="jn">1</span><span class="jic">${I("database", 18)}</span></div><div class="v num">${fmtInt(o.prospects)}</div><div class="k">Leads you get</div><p>Verified decision makers from Lead Finder</p></div>
+            <div class="jstep"><div class="jtop"><span class="jn">1</span><span class="jic">${I("database", 18)}</span></div><div class="v num">${fmtInt(o.prospects)}</div><div class="k">Leads you get</div><p>Decision makers from Lead Finder</p></div>
             <div class="jstep"><div class="jtop"><span class="jn">2</span><span class="jic">${I("send", 18)}</span></div><div class="v num">${fmtInt(o.prospects)}</div><div class="k">Prospects you reach</div><p>About ${fmtInt(o.prospectsPerDay)} a day, by email, LinkedIn and calls</p></div>
-            <div class="jstep"><div class="jtop"><span class="jn">3</span><span class="jic">${I("message", 18)}</span></div><div class="v num">${rng(o.replies)}</div><div class="k">Replies</div><p>Prospects who write back</p></div>
-            <div class="jstep win"><div class="jtop"><span class="jn">4</span><span class="jic">${I("calendar", 18)}</span></div><div class="v num">${rng(o.positive)}</div><div class="k">Meetings booked</div><p>Interested replies that become sales conversations</p></div>
+            <div class="jstep"><div class="jtop"><span class="jn">3</span><span class="jic">${I("message", 18)}</span></div><div class="v num">${rng(o.replies)}</div><div class="k">Replies</div><p>About ${pct(B.replyRateRange[0])}–${pct(B.replyRateRange[1])} of prospects write back</p></div>
+            <div class="jstep win"><div class="jtop"><span class="jn">4</span><span class="jic">${I("calendar", 18)}</span></div><div class="v num">${rng(o.positive)}</div><div class="k">Meetings booked</div><p>About ${pct(B.meetingRateRange[0])}–${pct(B.meetingRateRange[1])} of prospects book a call</p></div>
           </div>
           <div class="pl-note">${I("clock", 16)} <span>Saves about <b>${fmtInt(o.hours)} hours</b> of manual prospecting a month, the work of <b>${oneDp(o.sdrs)} full-time reps</b>.</span></div>
         </div>
@@ -127,7 +136,7 @@
 
         <div class="pl-final">
           <h2>Ready to start?</h2>
-          <p>The first 50 leads are already waiting in Saleshandy.</p>
+          <p>The first 50 leads are already picked in Saleshandy. Emails and phones are looked up when you request them.</p>
           <div class="row" style="justify-content:center">
             <a class="btn btn-primary btn-lg" href="${esc(C.cta.signupUrl)}" target="_blank" rel="noopener">Start free trial ${I("arrowRight", 18)}</a>
             <a class="btn btn-outline btn-lg" href="${esc(lfUrl)}" target="_blank" rel="noopener">Open the first 50 leads ${I("external", 16)}</a>
