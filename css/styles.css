@@ -810,3 +810,6 @@ table.leads td:nth-child(2) b, table.leads td:nth-child(2) small, table.leads td
 .section-sub span { font-size: 14px; color: var(--muted); }
 .strat-rules { margin: 12px 2px 0; font-size: 13px; color: var(--muted); line-height: 1.6; }
 .disclosure { margin-top: 16px; }
+
+.prim { white-space: nowrap; flex: none; }
+.icp-seg-h { flex-wrap: wrap; row-gap: 4px; }

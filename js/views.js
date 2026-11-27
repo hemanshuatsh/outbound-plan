@@ -20,16 +20,16 @@ window.SH_VIEWS = (function () {
     return `
       <div class="est">
         <div class="est-title">Your estimate</div>
-        <p class="est-lead">With <b>${fmtInt(o.prospects)}</b> people reached a month, ${who} can win <b>~${rng(o.clients)}</b> new clients.</p>
-        ${row("People we reach", fmtInt(o.prospects))}
+        <p class="est-lead">Reach <b>${fmtInt(o.prospects)}</b> prospects a month with Saleshandy and ${who} can win <b>~${rng(o.clients)}</b> new clients.</p>
+        ${row("Prospects you reach", fmtInt(o.prospects), "Lead Finder · Sequences")}
         ${conn(`~${pct(B.replyRateRange[0])}–${pct(B.replyRateRange[1])} reply`)}
-        ${row("Replies", `~${rng(o.replies)}`)}
+        ${row("Replies", `~${rng(o.replies)}`, "Unified Inbox")}
         ${conn(`~${whole(B.positiveShare)} are positive`)}
-        ${row("Positive replies", `~${rng(o.positiveReplies)}`, "They want to talk")}
+        ${row("Positive replies", `~${rng(o.positiveReplies)}`, "Interested and ready to talk")}
         ${conn(`~${whole(B.meetingShare)} book a meeting`)}
-        ${row("Meetings", `~${rng(o.meetings)}`, "Booked by your team")}
+        ${row("Meetings", `~${rng(o.meetings)}`, "Booked from your inbox")}
         ${conn(`~${whole(B.clientShare)} become clients`)}
-        ${row("New clients", `~${rng(o.clients)}`, "", "win")}
+        ${row("New clients", `~${rng(o.clients)}`, "Tracked in your CRM pipeline", "win")}
         <p class="est-note">Estimate: ~${pct(B.replyRateRange[0])} to ${pct(B.replyRateRange[1])} reply, ~${whole(B.positiveShare)} positive, ~${whole(B.meetingShare)} meet, ~${whole(B.clientShare)} buy. Yours can be better.</p>
       </div>`;
   }

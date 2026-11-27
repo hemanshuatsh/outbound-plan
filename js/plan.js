@@ -109,7 +109,7 @@
           </div>
           <div class="pl-value">
             ${V.estimate(o, { who: "you" })}
-            <p class="est-day">${I("clock", 15)} <span>Saves about <b>${fmtInt(o.hours)} hours</b> of manual prospecting a month, the work of ~${oneDp(o.sdrs)} full-time reps.</span></p>
+            <p class="est-day">${I("clock", 15)} <span>Saleshandy automates about <b>${fmtInt(o.hours)} hours</b> of manual prospecting a month, the work of ~${oneDp(o.sdrs)} full-time reps.</span></p>
           </div>
         </div>
 
@@ -120,10 +120,10 @@
             <div class="pl-kpi blue"><span>${I("users", 16)} Decision makers</span><b class="num">${fmtCompact(m.contacts)}</b></div>
             <div class="pl-kpi"><span>${I("building", 16)} Companies</span><b class="num">${fmtCompact(m.companies)}</b></div>
             <div class="pl-icp">
-              <div><small>Roles</small><b>${esc(listJoin(p.titles))}</b></div>
+              <div><small>Roles</small><b>${esc(currentIcp()?.ai ? currentIcp().champion : listJoin(p.titles))}</b></div>
               <div><small>Markets</small><b>${esc(listJoin(geoNames))}</b></div>
               <div><small>Company size</small><b>${esc(sizeRange())} employees</b></div>
-              <div><small>Industry</small><b>${esc(ind.name)}</b></div>
+              <div><small>${currentIcp()?.ai ? "Buyers" : "Industry"}</small><b>${esc(currentIcp()?.ai ? listJoin(currentIcp().segments.map((x) => x[0])) : ind.name)}</b></div>
             </div>
           </div>
           ${currentIcp() && currentIcp().ai ? `<div class="ai-made" style="margin-top:14px">${I("sparkles", 13)} Written for ${esc(p.companyName || "your business")} by Saleshandy AI</div>` : ""}
@@ -153,7 +153,7 @@
             <a class="btn btn-primary btn-lg" href="${esc(C.cta.signupUrl)}" target="_blank" rel="noopener">Start free trial ${I("arrowRight", 18)}</a>
             <a class="btn btn-outline btn-lg" href="${esc(lfUrl)}" target="_blank" rel="noopener">Open the first 50 leads ${I("external", 16)}</a>
           </div>
-          <div class="muted small" style="margin-top:16px">Booth code <b style="color:var(--ink)">${esc(C.cta.promoCode)}</b> · ${C.cta.trialDays}-day free trial · no credit card · trusted by 25,000+ businesses</div>
+          <div class="muted small" style="margin-top:16px">${C.cta.trialDays}-day free trial · no credit card · trusted by 25,000+ businesses</div>
         </div>
       </section>`;
     bind();
