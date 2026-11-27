@@ -34,28 +34,21 @@ window.SH_VIEWS = (function () {
       </div>`;
   }
 
-  // Strategy chosen by the engine in api.js (channel mix, steps, rules, angle).
+  // Strategy chosen by the engine in api.js (channel mix, steps, angle, rules).
   function strategy(st) {
     return `
-      <div class="strat-head card">
-        <div class="strat-mix">
-          <small>Recommended channel mix</small>
-          <h3>${esc(st.name)}</h3>
+      <div class="card strat-card">
+        <div class="strat-top">
+          <div><small>Recommended channel mix</small><h3>${esc(st.name)}</h3></div>
           <div class="mix-icons">${st.channels.filter((c) => !/After/.test(c.when)).map((c) => `<span class="chan-ic c-${c.ch}" title="${esc(c.name)}">${I(CH_ICON[c.ch], 16)}</span>`).join("")}</div>
         </div>
-        <ul class="strat-why">${st.why.map((w) => `<li>${I("check", 14)}<span>${esc(w)}</span></li>`).join("")}</ul>
+        <ul class="strat-why">${st.why.map((w) => `<li>${esc(w)}</li>`).join("")}</ul>
+        <p class="strat-angle"><b>Message angle:</b> lead with ${esc(st.angle.lead)}, prove it with ${esc(st.angle.proof)}, and ask for ${esc(st.angle.cta)}.</p>
       </div>
-      <div class="angle">${I("sparkles", 16)}<span><b>Message angle:</b> lead with ${esc(st.angle.lead)}, prove it with ${esc(st.angle.proof)}, and ask for ${esc(st.angle.cta)}.</span></div>
-      <div class="channels-grid">${st.channels.map((c) => `
-        <div class="card chan ${/After/.test(c.when) ? "chan-later" : ""}">
-          <div class="chan-head"><span class="chan-ic c-${c.ch}">${I(CH_ICON[c.ch], 18)}</span><div><small>${esc(c.role)}</small><b>${esc(c.name)}</b></div></div>
-          <p>${esc(c.text)}</p>
-          <div class="meta"><span>When: <b>${esc(c.when)}</b></span><span>Volume: <b>${esc(c.volume)}</b></span></div>
-        </div>`).join("")}</div>
-      <div class="section-head"><h2>Your ${st.days}-day sequence</h2><p>${st.steps.length} touches for every prospect, written by AI and stopped as soon as they reply.</p></div>
+      <div class="section-sub"><b>Your ${st.days}-day sequence</b><span>${st.steps.length} touches per prospect, stopped as soon as they reply</span></div>
       <div class="card"><div class="seq">${st.steps.map((s) => `
-        <div class="seq-step"><div class="dot c-${s.ch}">${I(CH_ICON[s.ch], 18)}</div><div class="day">Day ${s.day}</div><div class="what">${esc(s.what)}</div><div class="note">${esc(s.note)}</div></div>`).join("")}</div></div>
-      <div class="rules">${st.rules.map((r) => `<span>${I("shield", 14)} ${esc(r)}</span>`).join("")}</div>`;
+        <div class="seq-step"><div class="dot c-${s.ch}">${I(CH_ICON[s.ch], 18)}</div><div class="day">Day ${s.day}</div><div class="what">${esc(s.what)}</div></div>`).join("")}</div></div>
+      <p class="strat-rules">${st.rules.join(" · ")}</p>`;
   }
 
   // First 30 days. Saleshandy's pre-warmed mailboxes mean sending starts on day 1.
@@ -71,47 +64,57 @@ window.SH_VIEWS = (function () {
   }
 
   // Ideal customer profile: who to target, who not, when, who to talk to,
-  // what they care about, objections. Personalised by api.buildIcp().
-  function icp(c) {
+  // the outcome they want, and what they'll push back with.
+  function icp(c, { objections = true } = {}) {
     if (!c) return "";
     return `
       <div class="icp">
         <div class="icp-top">
           <div class="card icp-yes">
-            <div class="icp-h ok">${I("check", 16)} Who to target</div>
+            <div class="icp-h">${I("target", 16)} Who to target</div>
             ${c.segments.map((s, i) => `
               <div class="icp-seg">
-                <div class="icp-seg-h"><b>${esc(s[0])}</b>${i === 0 ? '<span class="prim">Primary</span>' : ""}</div>
-                <small>${esc(s[1])}${i === 0 && c.firmo ? ` · ${esc(c.firmo)}` : ""}</small>
-                <p><span>Their pain:</span> ${esc(s[2])}</p>
+                <span class="icp-n">${i + 1}</span>
+                <div>
+                  <div class="icp-seg-h"><b>${esc(s[0])}</b>${i === 0 ? '<span class="prim">Start here</span>' : ""}</div>
+                  ${s[1] ? `<small>${esc(s[1])}${i === 0 && c.firmo ? ` · ${esc(c.firmo)}` : ""}</small>` : ""}
+                  ${s[2] ? `<p>${esc(s[2])}</p>` : ""}
+                </div>
               </div>`).join("")}
           </div>
           <div class="card icp-no">
-            <div class="icp-h no">${I("cross", 16)} Who not to target</div>
-            <ul>${c.notFor.map((n) => `<li>${I("cross", 13)}<span>${esc(n)}</span></li>`).join("")}</ul>
-            <p class="icp-tip">Skipping these keeps your reply rate high and your domains healthy.</p>
+            <div class="icp-h">${I("cross", 16)} Who not to target</div>
+            <ul>${c.notFor.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>
+            <p class="icp-tip">Skipping these keeps reply rates high and your domains healthy.</p>
           </div>
         </div>
-        <div class="icp-row3">
+        <div class="icp-row2">
           <div class="card icp-c">
             <div class="icp-h">${I("zap", 16)} When to reach out</div>
-            <ul class="trig">${c.triggers.map((t) => `<li><b>${esc(t[0])}</b><span>${esc(t[1])}</span></li>`).join("")}</ul>
+            <ul class="trig">${c.triggers.map((t) => `<li><b>${esc(t[0])}</b>${t[1] ? `<span>${esc(t[1])}</span>` : ""}</li>`).join("")}</ul>
           </div>
           <div class="card icp-c">
             <div class="icp-h">${I("users", 16)} Who to talk to</div>
             <div class="role"><small>Feels the pain daily</small><b>${esc(c.champion)}</b></div>
-            <div class="role"><small>Approves the budget</small><b>${esc(c.approver)}</b></div>
-          </div>
-          <div class="card icp-c">
-            <div class="icp-h">${I("target", 16)} What they care about</div>
-            <ul class="pains">${c.pains.map((p) => `<li>${esc(p)}</li>`).join("")}</ul>
-            <div class="outcome">${I("trendingUp", 15)} <span>${esc(c.outcome)}</span></div>
+            ${c.approver ? `<div class="role"><small>Approves the budget</small><b>${esc(c.approver)}</b></div>` : ""}
+            ${c.outcome ? `<div class="outcome"><small>The result they want</small><b>${esc(c.outcome)}</b></div>` : ""}
           </div>
         </div>
+        ${objections && c.objections && c.objections.length ? `
         <div class="card icp-obj">
-          <div class="icp-h">${I("message", 16)} Objections you'll hear, and what to say</div>
+          <div class="icp-h">${I("message", 16)} What they'll say, and how to answer</div>
           <div class="objs">${c.objections.map((o) => `<div class="obj"><span class="q">“${esc(o[0])}”</span><span class="a">${esc(o[1])}</span></div>`).join("")}</div>
-        </div>
+        </div>` : ""}
+      </div>`;
+  }
+
+  // Shown while Saleshandy AI writes the visitor's ICP.
+  function icpLoading(name) {
+    return `
+      <div class="card icp-loading">
+        <span class="spin"></span>
+        <div><b>Saleshandy AI is building ${esc(name || "your")} ideal customer profile</b>
+        <p>Reading the business and working out who to target, who to skip and when to reach out. Usually 20–40 seconds.</p></div>
       </div>`;
   }
 
@@ -120,5 +123,5 @@ window.SH_VIEWS = (function () {
     return st.channels.map((c) => `- ${c.name}: ${c.when}`).join("\n");
   }
 
-  return { estimate, strategy, timeline, strategyText, icp };
+  return { estimate, strategy, timeline, strategyText, icp, icpLoading };
 })();

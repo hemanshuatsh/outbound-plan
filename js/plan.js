@@ -50,7 +50,30 @@
     return order.length === 1 ? a.name : `${a.name.split("–")[0]}–${b.name.includes("–") ? b.name.split("–")[1] : b.name}`;
   }
 
+  // The visitor's AI-written ICP, saved as a secret gist by the booth.
+  async function loadAiIcp() {
+    if (!S.gist) return null;
+    const owner = C.cta.gistOwner || "hemanshuatsh";
+    try {
+      const ctrl = new AbortController(); setTimeout(() => ctrl.abort(), 6000);
+      const r = await fetch(`https://gist.githubusercontent.com/${owner}/${S.gist}/raw/plan.json`, { signal: ctrl.signal });
+      const d = await r.json();
+      return d && d.icp && Array.isArray(d.icp.segments) && d.icp.segments.length ? d.icp : null;
+    } catch (e) { return null; }
+  }
+  function currentIcp() {
+    const base = API.buildIcp(p);
+    const ai = S.aiIcp;
+    if (!ai) return base;
+    const pick = (x, y) => (x && (!Array.isArray(x) || x.length) ? x : y);
+    return { ...base, segments: pick(ai.segments, base?.segments), notFor: pick(ai.notFor, base?.notFor), triggers: pick(ai.triggers, base?.triggers),
+      champion: ai.champion || base?.champion, approver: ai.approver || base?.approver, pains: pick(ai.pains, base?.pains),
+      outcome: ai.outcome || base?.outcome, objections: pick(ai.objections, base?.objections), ai: true };
+  }
+
   async function init() {
+    root.innerHTML = `<section class="screen" style="text-align:center;padding-top:80px"><span class="spin" style="display:inline-block"></span><p class="muted">Loading your plan…</p></section>`;
+    S.aiIcp = await loadAiIcp();
     const full = await API.getMarketSize(p);
     S.market = S.market ? { ...full, ...S.market, withEmail: Math.round(S.market.contacts * D.coverage.email), withPhone: Math.round(S.market.contacts * D.coverage.phone), withLinkedin: Math.round(S.market.contacts * D.coverage.linkedin) } : full;
     S.leads = await API.getSampleLeads(p, 50);
@@ -59,6 +82,8 @@
 
   function render() {
     const o = API.outreach({ prospects: S.prospects }), m = S.market, st = API.buildStrategy(p, o), V = window.SH_VIEWS;
+    const ci = currentIcp(); const lf = (x) => (x ? x.charAt(0).toLowerCase() + x.slice(1) : x);
+    if (ci && ci.ai && ci.segments[0]) st.angle = { lead: lf(ci.segments[0][2] || st.angle.lead), proof: lf(ci.outcome || st.angle.proof), cta: "a 15-minute call" };
     const chan = (key, name, role, text, when, volume) => `
       <div class="card chan">
         <div class="chan-head"><span class="chan-ic c-${key}">${I(CH_ICON[key], 18)}</span><div><small>${role}</small><b>${name}</b></div></div>
@@ -101,7 +126,8 @@
               <div><small>Industry</small><b>${esc(ind.name)}</b></div>
             </div>
           </div>
-          <div style="margin-top:14px">${V.icp(API.buildIcp(p))}</div>
+          ${currentIcp() && currentIcp().ai ? `<div class="ai-made" style="margin-top:14px">${I("sparkles", 13)} Written for ${esc(p.companyName || "your business")} by Saleshandy AI</div>` : ""}
+          <div style="margin-top:14px">${V.icp(currentIcp())}</div>
         </div>
 
         <div class="pl-section">

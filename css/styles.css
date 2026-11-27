@@ -742,3 +742,71 @@ table.leads td:nth-child(2) b, table.leads td:nth-child(2) small, table.leads td
 .obj .a { font-size: 14px; color: var(--ink-2); line-height: 1.45; }
 @media (max-width: 1000px) { .icp-top, .icp-row3 { grid-template-columns: 1fr; } }
 @media (max-width: 700px) { .objs { grid-template-columns: 1fr; } }
+
+/* =====================================================================
+   Calm palette: no red/green "good/bad" colouring. Saleshandy's own
+   ink, blue and yellow highlight carry emphasis. (WhatsApp keeps its
+   brand green so it stays recognisable.)
+   ===================================================================== */
+:root { --green: var(--ink); --green-500: var(--primary); --green-50: var(--hl); }
+.er.win { background: var(--hl); border-color: var(--hl-strong); }
+.er.win b { color: var(--ink); }
+.kid.win, .cy.win { background: var(--hl); border-color: var(--hl-strong); }
+.kid.win .kid-ic, .cy.win .cy-ic { background: #fff; color: var(--ink); }
+.kid.win b, .cy.win b { color: var(--ink); }
+.reach2 .r-out { color: var(--primary); }
+.reach2.on .r-out { color: #fff; }
+.worth-in .big { color: var(--ink); }
+.done-hero .check { background: var(--primary-50); color: var(--primary); }
+.yes, .ok { color: var(--ink-2); }
+.thanks { background: var(--primary-50); color: var(--primary); }
+.strat-why li .i, .rules .i { color: var(--muted-2); }
+.pl-progress .bar i { background: var(--primary); }
+
+/* ---------- Plan tabs (one section at a time) ---------- */
+.plan-tabs { display: flex; gap: 6px; margin: 6px 0 22px; padding: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; width: fit-content; max-width: 100%; overflow-x: auto; }
+.plan-tabs button { display: inline-flex; align-items: center; gap: 8px; border: 0; background: transparent; border-radius: 10px; padding: 10px 16px; font-weight: 600; font-size: 15px; color: var(--muted); white-space: nowrap; }
+.plan-tabs button span { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; background: #fff; border: 1px solid var(--line-2); color: var(--muted); }
+.plan-tabs button.on { background: #fff; color: var(--ink); box-shadow: var(--shadow-sm); }
+.plan-tabs button.on span { background: var(--primary); border-color: var(--primary); color: #fff; }
+.plan-tabs button.done span { background: var(--primary-50); border-color: var(--primary-100); color: var(--primary); }
+.plan-body { animation: rise .3s ease both; }
+
+/* ---------- ICP v2: calmer, numbered, neutral ---------- */
+.icp-h { color: var(--ink-2) !important; font-size: 13px; }
+.icp-h .i { color: var(--primary); }
+.icp-yes { background: #fff; }
+.icp-seg { display: grid; grid-template-columns: 26px 1fr; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+.icp-seg:first-of-type { border-top: 0; }
+.icp-yes .icp-h + .icp-seg { border-top: 0; padding-top: 2px; }
+.icp-n { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; background: var(--primary-50); color: var(--primary); }
+.icp-seg p { margin: 6px 0 0; font-size: 14px; color: var(--ink-2); line-height: 1.45; }
+.prim { color: #7a5b00 !important; background: var(--hl) !important; border: 1px solid var(--hl-strong) !important; }
+.icp-no { background: var(--surface) !important; border-color: var(--line) !important; }
+.icp-no ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.icp-no li { display: block; position: relative; padding-left: 16px; font-size: 14px; color: var(--ink-2); line-height: 1.45; }
+.icp-no li::before { content: ""; position: absolute; left: 0; top: .62em; width: 8px; height: 2px; background: var(--muted-2); }
+.icp-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.outcome { display: block; margin-top: 12px; padding: 12px 14px; border-radius: 12px; background: var(--primary-50); color: var(--ink); }
+.outcome small { display: block; font-size: 12px; color: var(--primary); font-weight: 600; }
+.outcome b { font-size: 15px; font-weight: 600; }
+.icp-loading { display: flex; gap: 14px; align-items: flex-start; padding: 22px; background: var(--primary-50); border-color: var(--primary-100); }
+.icp-loading .spin, .spin { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--primary-100); border-top-color: var(--primary); animation: spin .7s linear infinite; flex: none; margin-top: 3px; }
+.icp-loading b { font-size: 16px; }
+.icp-loading p { margin: 4px 0 0; font-size: 14px; color: var(--muted); }
+.ai-made { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 12px; font-size: 13px; font-weight: 600; color: var(--purple); background: #f4efff; border-radius: 999px; padding: 5px 12px; }
+@media (max-width: 1000px) { .icp-row2 { grid-template-columns: 1fr; } }
+
+/* ---------- Strategy v2: one card + sequence ---------- */
+.strat-card { padding: 22px 24px; }
+.strat-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.strat-top small { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted-2); }
+.strat-top h3 { font-size: 22px; margin-top: 4px; }
+.strat-card .strat-why { list-style: disc; margin: 14px 0 0; padding-left: 20px; border: 0; display: grid; gap: 6px; }
+.strat-card .strat-why li { display: list-item; font-size: 15px; color: var(--ink-2); }
+.strat-angle { margin: 14px 0 0; padding-top: 14px; border-top: 1px solid var(--line); font-size: 15px; color: var(--ink-2); line-height: 1.5; }
+.section-sub { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin: 22px 0 10px; }
+.section-sub b { font-size: 17px; }
+.section-sub span { font-size: 14px; color: var(--muted); }
+.strat-rules { margin: 12px 2px 0; font-size: 13px; color: var(--muted); line-height: 1.6; }
+.disclosure { margin-top: 16px; }

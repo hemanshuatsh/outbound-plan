@@ -362,7 +362,7 @@ window.SH_API = (function () {
   const unmask = (all, v) => { const n = parseInt(v || "0", 36) || 0; return all.filter((_, i) => n & (1 << i)); };
   const enc = (v) => encodeURIComponent(v || "").replace(/%20/g, "_").replace(/~/g, "%7E");
   const dec = (v) => decodeURIComponent((v || "").replace(/_/g, " "));
-  function encodePlan({ profile, prospects, market }) {
+  function encodePlan({ profile, prospects, market, gist }) {
     const ind = industryById(profile.industryId);
     return [
       "1", enc(profile.companyName), enc(profile.domain),
@@ -373,6 +373,7 @@ window.SH_API = (function () {
       b36(Math.max(0, C.benchmarks.volumeOptions.indexOf(prospects))),
       market ? b36(market.contacts) : "", market ? b36(market.companies) : "",
       (profile.brandColor || "").replace("#", ""),
+      /^[0-9a-f]{20,40}$/.test(gist || "") ? gist : "",
     ].join("~").replace(/~+$/, "");
   }
   function decodePlan(str) {
@@ -394,6 +395,7 @@ window.SH_API = (function () {
         },
         prospects: C.benchmarks.volumeOptions[parseInt(f[7] || "0", 36)] || C.benchmarks.defaultProspects,
         market: f[8] ? { contacts: parseInt(f[8], 36), companies: parseInt(f[9] || "0", 36) } : null,
+        gist: /^[0-9a-f]{20,40}$/.test(f[11] || "") ? f[11] : "",
       };
     }
     // Older links: plan.html#c=…&d=…&i=…

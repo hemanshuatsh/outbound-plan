@@ -25,6 +25,8 @@ window.SH_CONFIG = {
     // Visitors' phones open this from the QR, so it must be reachable on the internet.
     // Leave empty to use the address this page is served from (fine for local testing only).
     planBaseUrl: "https://hemanshuatsh.github.io/outbound-plan/",
+    // Secret gists holding each visitor's AI-written ICP (created by tools/serve.py).
+    gistOwner: "hemanshuatsh",
   },
 
   // Optional: POST captured booth leads to a webhook (n8n / Zapier / Sheets).
