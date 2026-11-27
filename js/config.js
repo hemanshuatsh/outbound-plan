@@ -15,6 +15,8 @@ window.SH_CONFIG = {
   cta: {
     signupUrl:
       "https://my.saleshandy.com/signup?utm_source=techexpo_gujarat&utm_medium=booth&utm_campaign=teg2026",
+    // Shorter link used inside WhatsApp / share messages (still tracked).
+    signupShortUrl: "https://my.saleshandy.com/signup?utm_source=teg2026",
     freeLeadCredits: 50,               // "Redeem your first 50 verified leads"
     promoCode: "TEG2026",              // TODO: confirm with growth team before the event
     trialDays: 7,
@@ -22,7 +24,7 @@ window.SH_CONFIG = {
     // Public address where plan.html is hosted (e.g. "https://plan.saleshandy.com/plan.html").
     // Visitors' phones open this from the QR, so it must be reachable on the internet.
     // Leave empty to use the address this page is served from (fine for local testing only).
-    planBaseUrl: "https://hemanshuatsh.github.io/outbound-plan/plan.html",
+    planBaseUrl: "https://hemanshuatsh.github.io/outbound-plan/",
   },
 
   // Optional: POST captured booth leads to a webhook (n8n / Zapier / Sheets).
@@ -58,11 +60,11 @@ window.SH_CONFIG = {
     phoneCoverage: 0.5,        // share of prospects with a verified direct/mobile number
     positiveReplyShare: 0.35,  // share of replies that are interested / positive
     meetingFromPositive: 0.6,  // positive replies that turn into a booked meeting
-    emailsPerProspect: 3,      // email touches per prospect in the sequence
-    emailsPerMailboxPerDay: 40,// safe daily send per warmed mailbox
+    emailsPerProspect: 4,      // 4 emails per prospect in the sequence (Day 1, 4, 8, 13)
+    emailsPerMailboxPerDay: 30,// Saleshandy-purchased Google/Microsoft mailboxes: 30/day in-platform limit
     mailboxesPerDomain: 3,     // Saleshandy recommendation
     workingDaysPerMonth: 22,
-    warmupDays: 14,
+    warmupDays: 0,             // Saleshandy pre-warmed mailboxes: start sending from day 1
     mailboxCostUsd: 3.49,      // Saleshandy email infrastructure, annual flexi
     domainCostUsdYear: 14,
     sources: [

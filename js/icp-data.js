@@ -1,0 +1,218 @@
+/* ==========================================================================
+   Ideal Customer Profiles per industry, following the ICP framework of the
+   Saleshandy outbound playbook (outreach-superpower icp-builder):
+   who it's for (3 segments, 1 primary) · who it's NOT for · why now (triggers)
+   · buying roles (feels the pain vs approves budget) · pains → outcome
+   · objections + counters.
+   Personalised at runtime with the visitor's company, roles, markets and size.
+   ========================================================================== */
+window.SH_ICP = {
+  "it-services": {
+    segments: [
+      ["Funded SaaS startups", "Seed to Series B, building product faster than they can hire", "The roadmap is slipping and senior engineers take months to hire"],
+      ["Healthcare & fintech scale-ups", "Regulated products with thin in-house teams", "Compliance-heavy builds with not enough engineers"],
+      ["SMEs going digital", "Traditional businesses replacing legacy systems", "Old systems and no in-house tech team"],
+    ],
+    notFor: ["Pre-seed founders with no budget yet", "Enterprises with large in-house IT and fixed vendor lists", "Buyers looking only for the cheapest freelancer", "Agencies that resell development"],
+    triggers: [["Hiring engineers", "3+ open developer roles"], ["Raised funding", "in the last 6 months"], ["New CTO or VP Engineering", "in the last 90 days"], ["Product launch or rebuild", "announced recently"]],
+    champion: "CTO, VP Engineering, Head of Product", approver: "Founder / CEO, CFO",
+    pains: ["The roadmap keeps slipping", "Hiring senior engineers takes months", "Tech debt slows every release"],
+    outcome: "Ship features 2x faster without growing headcount",
+    objections: [["We hire in-house", "A dedicated team starts in 2 weeks, not 3 months, and scales down when you need"], ["Offshore quality worries us", "Start with a 2-week paid pilot on one feature, with your own code reviews"]],
+  },
+  saas: {
+    segments: [
+      ["Mid-market teams on spreadsheets", "50–500 employees running key work manually", "Hours lost every week to manual work and copy-paste"],
+      ["Fast-growing startups", "Seed to Series B, processes breaking as they scale", "Tools that worked at 20 people break at 100"],
+      ["Agencies & service firms", "Client work spread across too many tools", "No single view of work, clients and results"],
+    ],
+    notFor: ["Teams under 10 with no clear budget owner", "Enterprises locked into multi-year contracts with a competitor", "Industries you can't serve yet (compliance gaps)"],
+    triggers: [["Hiring ops or RevOps roles", "processes are being rebuilt"], ["New Head of Operations", "in the last 90 days"], ["Using a competitor", "visible in their tech stack"], ["Raised funding", "budget for new tools"]],
+    champion: "Head of Operations, team leads", approver: "Founder / CEO, COO",
+    pains: ["Manual work eats hours every week", "Tools don't talk to each other", "Reporting takes days, not minutes"],
+    outcome: "Save ~6 hours per person every week",
+    objections: [["We already use another tool", "Teams switch for the time saved. A 14-day side-by-side trial shows the difference"], ["Not a priority right now", "It's 15 minutes to see if ~6 hours a week per person is worth it"]],
+  },
+  "marketing-agency": {
+    segments: [
+      ["D2C & e-commerce brands", "Spending on ads every month, growing online", "Ad costs rising while sales stay flat"],
+      ["Real estate developers & clinics", "Need steady local leads", "Leads come in waves, then dry up"],
+      ["B2B SaaS companies", "Need pipeline, not just traffic", "Marketing brings traffic but few qualified leads"],
+    ],
+    notFor: ["Businesses with no marketing budget", "Brands with a large in-house marketing team", "Buyers wanting a one-off project only"],
+    triggers: [["Running ads, CAC rising", "visible in ad libraries"], ["Launching a product or new location", "announced recently"], ["Hiring a marketing manager", "they need help now"], ["Website redesign", "or a new brand launch"]],
+    champion: "Marketing Head, Growth Manager", approver: "Founder / CEO",
+    pains: ["Customer acquisition cost keeps rising", "Leads are inconsistent month to month", "No time to manage every channel"],
+    outcome: "Lower acquisition cost and predictable leads",
+    objections: [["We tried an agency before", "Start with a 30-day audit and pilot with clear KPIs"], ["We do it in-house", "We work alongside your team on the channels you don't have time for"]],
+  },
+  manufacturing: {
+    segments: [
+      ["OEMs & machine builders", "Buying components on a regular schedule", "Supplier delays hold up production"],
+      ["EPC & project contractors", "Project-based buying with tight deadlines", "Late deliveries put project penalties at risk"],
+      ["Industrial distributors", "Stocking for many end customers", "Stock-outs and inconsistent quality"],
+    ],
+    notFor: ["Traders looking only for the lowest price", "Buyers locked into single-source contracts", "Small workshops with irregular demand"],
+    triggers: [["New plant or capacity expansion", "announced recently"], ["Supply disruption or China+1 sourcing", "looking for a second source"], ["New project wins or tenders", "demand coming up"], ["Hiring procurement roles", "vendor base under review"]],
+    champion: "Purchase Manager, Plant Head", approver: "Head of Procurement, Managing Director",
+    pains: ["Supplier delays stop production", "Quality rejections cost time and money", "Single-source risk"],
+    outcome: "A reliable second source with on-time delivery",
+    objections: [["We have existing suppliers", "Most buyers add us as a second source first. Try a sample batch"], ["We're worried about quality", "Certifications, a factory visit or video audit, and samples first"]],
+  },
+  textiles: {
+    segments: [
+      ["Apparel brands diversifying sourcing", "Mid-size labels planning the next season", "Delays and quality swings from current mills"],
+      ["Retail chains' private labels", "Volume buying on fixed calendars", "Missed delivery windows cost the season"],
+      ["Importers & sourcing agents", "Buying for multiple brands", "Finding reliable mills that can scale"],
+    ],
+    notFor: ["Buyers needing tiny order quantities below your minimum", "Fast-fashion buyers demanding unrealistic lead times", "Brands with exclusive mill partnerships"],
+    triggers: [["New collection or season planning", "sourcing is open now"], ["Shifting sourcing away from China", "China+1 strategy"], ["New sourcing manager", "in the last 90 days"], ["Entering new markets", "need more capacity"]],
+    champion: "Sourcing Manager, Merchandiser", approver: "Head of Buying, Founder",
+    pains: ["Late shipments", "Inconsistent quality between batches", "Rising production costs"],
+    outcome: "On-time, consistent production at a better cost",
+    objections: [["We already have mills", "Add us for one style this season. Samples in 10 days"], ["Your minimum order is too high", "Flexible minimums for the first order"]],
+  },
+  "chemicals-pharma": {
+    segments: [
+      ["Pharma formulators", "Need a qualified second API source", "Single-source supply risk"],
+      ["Specialty chemical distributors", "Buying for many industrial customers", "Price swings and supply gaps"],
+      ["CDMOs & contract manufacturers", "Producing for multiple clients", "Documentation delays hold up batches"],
+    ],
+    notFor: ["Buyers needing grades you can't certify", "Spot buyers chasing a one-off lowest price", "Markets where you lack regulatory filings"],
+    triggers: [["Supply shortage or price spike", "in their category"], ["New product filings", "need new raw materials"], ["Supplier audit cycle", "vendor list under review"], ["Expanding into regulated markets", "need compliant sources"]],
+    champion: "Procurement Manager, R&D / Formulation Head", approver: "Head of Supply Chain, QA Head",
+    pains: ["Single-source risk", "Slow documentation and audits", "Price volatility"],
+    outcome: "A qualified second source with complete documentation",
+    objections: [["Qualifying a new source takes too long", "Full documentation pack ready, and we support your audits"], ["Your price is higher", "Long-term contract pricing with supply stability"]],
+  },
+  jewellery: {
+    segments: [
+      ["Independent jewellery retailers", "Growing stores adding new ranges", "Slow turnaround from current suppliers"],
+      ["Online jewellery brands", "Fast-moving D2C collections", "Need certified stock quickly"],
+      ["Wholesalers & bridal stores", "Seasonal, high-value buying", "Margin pressure on certified stones"],
+    ],
+    notFor: ["Buyers seeking non-certified stones", "Very small one-off orders", "Brands locked into exclusive suppliers"],
+    triggers: [["Adding a lab-grown range", "announced or on their site"], ["Bridal or festive season", "buying window is open"], ["New store opening", "need fresh stock"], ["New buyer or merchandiser", "supplier list under review"]],
+    champion: "Buyer, Head of Merchandising", approver: "Owner / Founder",
+    pains: ["Slow turnaround", "Inconsistent certification", "Shrinking margins"],
+    outcome: "Certified stock, faster, at better margins",
+    objections: [["We have suppliers", "Try a memo or a small trial order"], ["Lab-grown doesn't sell for us", "We'll share sell-through data from similar retailers"]],
+  },
+  ceramics: {
+    segments: [
+      ["Tile importers & distributors", "Container buyers in your markets", "Shade and quality vary between shipments"],
+      ["Real estate developers & contractors", "Large projects with fixed timelines", "Delays hold up handovers"],
+      ["Architects & interior firms", "They specify the tiles for projects", "Need reliable, consistent finishes"],
+    ],
+    notFor: ["Individual homeowners", "Buyers needing loads smaller than a container", "Markets with duties you can't absorb"],
+    triggers: [["New large projects", "announced or under construction"], ["New showroom or warehouse", "expanding range"], ["Current supplier price hikes or delays", "open to switching"], ["Trade fair follow-ups", "met at an expo"]],
+    champion: "Purchase Head, Project Manager", approver: "Owner / Managing Director",
+    pains: ["Inconsistent shade and quality", "Shipping delays", "Price swings"],
+    outcome: "Consistent quality and on-time containers",
+    objections: [["We buy from China or Spain", "Similar quality at a better landed cost. We'll send samples"], ["Freight costs are high", "Delivered quotes and consolidated shipping"]],
+  },
+  solar: {
+    segments: [
+      ["Factories with high power bills", "Manufacturing units with large rooftops", "Power is their biggest controllable cost"],
+      ["Commercial buildings & warehouses", "Large roof area, daytime load", "Rising electricity bills"],
+      ["Hospitals & schools", "Need reliable, cheaper power", "Power cuts and high tariffs"],
+    ],
+    notFor: ["Rented premises without owner approval", "Sites with very low power use", "Buyers comparing only the lowest price per watt"],
+    triggers: [["Power tariff hike", "in their state"], ["Capacity expansion or new plant", "more power needed"], ["Sustainability targets", "ESG reporting pressure"], ["New CFO or Plant Head", "cost review underway"]],
+    champion: "Plant Head, Facility Manager", approver: "Managing Director, CFO",
+    pains: ["High power bills", "Unreliable supply", "Sustainability pressure"],
+    outcome: "30–40% lower power costs, paying back in under 4 years",
+    objections: [["It's too expensive upfront", "A pay-as-you-save model with zero upfront cost"], ["Our roof isn't suitable", "A free site survey, with ground-mount options"]],
+  },
+  logistics: {
+    segments: [
+      ["Exporters & importers", "Regular international shipments", "Delays and hidden charges"],
+      ["Cross-border e-commerce sellers", "High volume, small parcels", "Slow delivery hurts reviews"],
+      ["Manufacturers with regular shipments", "Steady lanes every month", "Rising freight costs"],
+    ],
+    notFor: ["One-time shippers", "Shippers locked into annual contracts", "Lanes you don't serve"],
+    triggers: [["New export market", "opening new lanes"], ["Freight rate changes", "re-quoting lanes"], ["Peak season", "need extra capacity"], ["Missed or delayed shipments", "unhappy with current forwarder"]],
+    champion: "Logistics Manager, EXIM Manager", approver: "Supply Chain Head, Owner",
+    pains: ["Shipment delays", "Hidden charges", "Poor tracking"],
+    outcome: "On-time shipments at 12–18% lower cost",
+    objections: [["We already have a forwarder", "Quote your next shipment side by side"], ["Switching is painful", "We handle the documentation end to end"]],
+  },
+  staffing: {
+    segments: [
+      ["Tech companies hiring fast", "Multiple open engineering roles", "Roles stay open for months"],
+      ["Global Capability Centres", "Building teams in India", "Need to scale hiring quickly"],
+      ["Manufacturing & BFSI firms", "Specialist and leadership roles", "Hard-to-find niche talent"],
+    ],
+    notFor: ["Companies with a hiring freeze", "Firms with large in-house TA teams for volume roles", "Clients shopping only on the lowest fee"],
+    triggers: [["Multiple open roles", "visible on job boards"], ["Funding or expansion", "headcount plans growing"], ["New office or GCC set-up", "building a team from scratch"], ["New CHRO or TA Head", "in the last 90 days"]],
+    champion: "Head of Talent Acquisition, Hiring Managers", approver: "CHRO, Founder",
+    pains: ["Roles open for months", "Poor candidate quality", "TA team stretched thin"],
+    outcome: "Niche roles closed in ~21 days",
+    objections: [["We hire in-house", "We take the niche roles your team can't fill quickly"], ["Your fees are high", "Pay on joining, with a replacement guarantee"]],
+  },
+  education: {
+    segments: [
+      ["Corporate L&D teams", "Mid-to-large companies upskilling staff", "Skill gaps slow new projects"],
+      ["Colleges & universities", "Improving placements and outcomes", "Students lack job-ready skills"],
+      ["Schools", "Adding new programs", "Need modern, engaging content"],
+    ],
+    notFor: ["Institutions with no training budget", "Buyers wanting free content only", "Contacting outside budget season"],
+    triggers: [["Budget planning season", "next year's calendar being set"], ["New L&D Head", "in the last 90 days"], ["New technology rollout", "skill gap to close"], ["Accreditation cycle", "need to show improvement"]],
+    champion: "L&D Manager, Principal / Dean", approver: "HR Head, Director",
+    pains: ["Skill gaps", "Low engagement in training", "Hard to show ROI"],
+    outcome: "Measurable skill improvement",
+    objections: [["We have internal training", "We cover specialised skills, with certification"], ["No budget right now", "Start with a pilot batch"]],
+  },
+  "real-estate": {
+    segments: [
+      ["Companies expanding offices", "Growing headcount in your city", "They've outgrown their current space"],
+      ["Warehousing & logistics firms", "Need large, well-connected spaces", "Hard to find the right location"],
+      ["Retail chains & co-working operators", "Opening new locations", "Need move-in ready spaces fast"],
+    ],
+    notFor: ["Small teams needing only a few desks", "Companies that just signed long leases", "Buyers outside your city"],
+    triggers: [["Hiring surge", "headcount growing fast"], ["Funding round", "expansion budget"], ["Lease ending soon", "planning 6–9 months ahead"], ["Entering your city", "e.g. GIFT City or Ahmedabad"]],
+    champion: "Admin / Facility Head", approver: "CFO, Founder",
+    pains: ["Outgrown current space", "High rent for poor amenities", "Slow fit-outs"],
+    outcome: "The right space, faster move-in",
+    objections: [["We're not looking now", "Leases need 6–9 months of planning. We'll share options early"], ["It's over our budget", "Flexible terms and fit-out support"]],
+  },
+  healthcare: {
+    segments: [
+      ["Private hospitals", "Multi-specialty, growing departments", "Equipment downtime and slow service"],
+      ["Diagnostic chains", "Expanding centres", "Need reliable equipment fast"],
+      ["Clinics & distributors", "Smaller buyers in volume", "High cost of consumables"],
+    ],
+    notFor: ["Government tenders only (if you're not registered)", "Very small clinics", "Buyers locked into vendor contracts"],
+    triggers: [["New wing or department", "equipment needed"], ["Equipment replacement cycle", "older machines due"], ["New hospital opening", "full set-up needed"], ["Accreditation such as NABH", "upgrades required"]],
+    champion: "Biomedical Head, Department Head", approver: "Purchase Head, Hospital CEO",
+    pains: ["Equipment downtime", "Slow service response", "High running costs"],
+    outcome: "Reliable equipment with fast service",
+    objections: [["We already have a vendor", "Compare service response times and total cost"], ["Approval takes long", "We help with documentation for your approved-vendor list"]],
+  },
+  "finance-consulting": {
+    segments: [
+      ["Funded startups", "Growing fast after a round", "Founders spending time on compliance"],
+      ["Foreign companies entering India", "Setting up an Indian entity", "Complex regulations and filings"],
+      ["Growing SMEs", "Outgrowing their accountant", "Messy books and missed deadlines"],
+    ],
+    notFor: ["Very early founders with no revenue", "Companies with large in-house finance teams", "Buyers shopping only on price"],
+    triggers: [["Funding round", "investors want clean books"], ["Setting up an India entity", "in the last 6 months"], ["Rapid hiring", "payroll getting complex"], ["Audit or compliance deadline", "coming up"]],
+    champion: "Founder, Finance Head", approver: "CEO, CFO",
+    pains: ["Compliance risk", "Founder time spent on books", "Messy records"],
+    outcome: "Clean books and on-time compliance",
+    objections: [["We already have a CA", "We cover the full stack, including FEMA and transfer pricing"], ["It costs too much", "A fixed monthly fee"]],
+  },
+  "agri-food": {
+    segments: [
+      ["Food importers & distributors", "Buying Indian products regularly", "Inconsistent quality between lots"],
+      ["FMCG brands", "Sourcing ingredients at scale", "Certification and traceability gaps"],
+      ["Retail chains & HoReCa", "Steady, high-volume demand", "Supply delays in peak season"],
+    ],
+    notFor: ["Buyers needing certifications you don't have", "One-off spot buyers", "Markets with import bans"],
+    triggers: [["New product lines", "new ingredients needed"], ["Supply disruption at origin", "looking for new sources"], ["Seasonal or festival demand", "buying window open"], ["New category manager", "supplier list under review"]],
+    champion: "Category Manager, Procurement Manager", approver: "Owner, Head of Procurement",
+    pains: ["Inconsistent quality", "Certification gaps", "Supply delays"],
+    outcome: "Certified, consistent supply",
+    objections: [["We have suppliers", "Trial one container with full certification"], ["Your price is higher", "Direct-from-origin pricing"]],
+  },
+};

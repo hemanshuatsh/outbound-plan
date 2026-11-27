@@ -263,42 +263,141 @@ window.SH_API = (function () {
     };
   }
 
-  // ---- Multichannel plan (shared by the booth screen and plan.html) -------
-  const SEQUENCE = [
-    { day: 1, ch: "email", what: "Personalised intro" },
-    { day: 2, ch: "linkedin", what: "Connection request" },
-    { day: 4, ch: "email", what: "Follow-up with proof" },
-    { day: 6, ch: "call", what: "Intro call" },
-    { day: 8, ch: "linkedin", what: "LinkedIn message" },
-    { day: 11, ch: "email", what: "Quick-question nudge" },
-    { day: 14, ch: "whatsapp", what: "WhatsApp check-in" },
-  ];
-  function channelPlan(o) {
-    const linkedin = Math.min(o.prospects, 400);
-    const calls = Math.round(o.prospects * 0.15);
+  // ---- Outbound strategy engine ------------------------------------------
+  // Rules from the Saleshandy outbound playbook (outreach-superpower skill):
+  //  • B2B base = Email + LinkedIn: connect (no pitch) → pain opener → case-study
+  //    proof → LinkedIn message (new angle) → peer movement → breakup, ~2 weeks.
+  //  • High-value deals add a call task for prospects with 2+ opens.
+  //  • WhatsApp as a cold touch only where it's a normal business channel
+  //    (India, Middle East); elsewhere only after a positive reply.
+  //  • Guardrails: email 1 is 60–100 words with no links; one question CTA;
+  //    Tue–Thu 9–11am prospect time; stop on reply. Pre-warmed mailboxes, so sending starts on day 1.
+  const ANGLES = {
+    saas: { lead: "operational pain, not features", proof: "specific metrics, like 'cut onboarding time by 40%'", cta: "a short walkthrough" },
+    "marketing-agency": { lead: "a quick audit or tip, value first", proof: "a specific issue you spotted on their site", cta: "'Want me to share what I found?'" },
+    staffing: { lead: "their growth and open roles", proof: "a conversation, not a pitch", cta: "a low-pressure, opportunity-led question" },
+    "it-services": { lead: "a delivery or hiring bottleneck", proof: "named outcomes, like 'shipped 2x faster'", cta: "a 15-minute call" },
+    "finance-consulting": { lead: "a compliance or growth trigger, like a funding round", proof: "named clients and outcomes", cta: "a 15-minute call" },
+  };
+  const DEFAULT_ANGLE = { lead: "a specific observation about their business", proof: "a named customer and result", cta: "a quick yes-or-no reply" };
+
+  function buildStrategy(profile, o) {
+    const ind = industryById(profile.industryId);
+    const B = C.benchmarks;
+    const domestic = profile.geos.length === 1 && profile.geos[0] === "india";
+    const dealUsd = domestic ? ind.dealInr / C.kiosk.usdToInr : ind.dealUsd;
+    const highValue = dealUsd >= 15000;
+    const waMarkets = profile.geos.filter((g) => g === "india" || g === "middle-east").map((g) => D.geos.find((x) => x.id === g).name);
+    const whatsappCold = waMarkets.length > 0;
+
+    const steps = [
+      { day: 0, ch: "linkedin", what: "Connection request", note: "No pitch, under 300 characters" },
+      { day: 1, ch: "email", what: "Email 1: pain-point opener", note: "60–100 words, no links, one question" },
+      { day: 4, ch: "email", what: "Email 2: case-study proof", note: "A named customer and result" },
+      { day: 5, ch: "linkedin", what: "LinkedIn message", note: "A different angle from the emails" },
+      { day: 8, ch: "email", what: "Email 3: peer movement", note: "What similar companies are doing" },
+    ];
+    if (highValue) steps.push({ day: 8, ch: "call", what: "Call engaged prospects", note: "Only people who opened 2+ times" });
+    if (whatsappCold) steps.push({ day: 12, ch: "whatsapp", what: "WhatsApp check-in", note: "Short and casual, under 100 words" });
+    steps.push({ day: 13, ch: "email", what: "Email 4: breakup", note: "40–60 words, close the loop politely" });
+
+    const name = ["Email", "LinkedIn", highValue && "Calls", whatsappCold && "WhatsApp"].filter(Boolean).join(" + ");
+    const why = [
+      "LinkedIn warms up decision makers before and between emails.",
+      highValue ? `Deals of this size justify a short call, but only to prospects who opened twice or more.` : "Deal sizes here suit a lighter, volume-friendly mix, so no cold calls.",
+      whatsappCold ? `WhatsApp is a normal business channel in ${waMarkets.join(" & ")}, so it's used as a final check-in.` : "WhatsApp is kept for after someone replies, since cold WhatsApp doesn't suit these markets.",
+    ];
+    const linkedin = Math.min(o.prospects, 400); // ~100 connection requests a week keeps LinkedIn safe
+    const calls = highValue ? Math.round(o.prospects * 0.15) : 0;
+    const channels = [
+      { ch: "email", name: "Email", role: "Main channel", text: `AI-personalised emails from ${o.mailboxes} pre-warmed mailboxes (${B.emailsPerMailboxPerDay} a day each), sending from day 1.`, when: "Day 1, 4, 8 & 13", volume: `${o.prospects.toLocaleString("en-IN")} prospects × ${B.emailsPerProspect} emails` },
+      { ch: "linkedin", name: "LinkedIn", role: "Warm-up touch", text: "Connect without a pitch, then message with a different angle from the emails.", when: "Day 0, message on Day 5", volume: `~${linkedin.toLocaleString("en-IN")} requests a month (~${Math.round(linkedin / 4)} a week)` },
+      highValue
+        ? { ch: "call", name: "Calls", role: "Built-in dialer", text: "Call only the prospects who opened 2+ times. Warm calls, not cold ones.", when: "Day 8", volume: `~${calls.toLocaleString("en-IN")} calls a month (~${Math.max(1, Math.round(calls / B.workingDaysPerMonth))} a day)` }
+        : { ch: "call", name: "Calls", role: "When they reply", text: "Use the dialer to call back interested prospects quickly.", when: "After a positive reply", volume: `~${o.positiveReplies[0]}–${o.positiveReplies[1]} calls a month` },
+      whatsappCold
+        ? { ch: "whatsapp", name: "WhatsApp", role: "Final check-in", text: `A short, friendly check-in for prospects in ${waMarkets.join(" & ")}.`, when: "Day 12", volume: "Prospects with a phone number" }
+        : { ch: "whatsapp", name: "WhatsApp", role: "After they reply", text: "Confirm meetings with interested prospects, faster.", when: "After a positive reply", volume: `~${o.positiveReplies[0]}–${o.positiveReplies[1]} conversations a month` },
+    ];
+    const rules = [
+      "First email under 100 words, no links or attachments",
+      "One clear question as the call to action",
+      "Send Tuesday to Thursday, 9 to 11am in their time zone",
+      "Every follow-up uses a new angle; stop as soon as they reply",
+    ];
+    return { name, why, steps, channels, rules, angle: ANGLES[ind.id] || DEFAULT_ANGLE, highValue, whatsappCold, days: steps[steps.length - 1].day + 1 };
+  }
+
+  // ---- Ideal customer profile (personalised) ---------------------------------
+  function buildIcp(profile) {
+    const ind = industryById(profile.industryId);
+    const base = (window.SH_ICP || {})[ind.id];
+    if (!base) return null;
+    const order = D.sizes.map((s) => s.id).filter((id) => profile.sizes.includes(id));
+    const a = D.sizes.find((s) => s.id === order[0]), b = D.sizes.find((s) => s.id === order[order.length - 1]);
+    const size = !a ? "" : order.length === 1 ? a.name : `${a.name.split("–")[0]}–${b.name.includes("–") ? b.name.split("–")[1] : b.name}`;
+    const markets = profile.geos.map((g) => D.geos.find((x) => x.id === g)?.name).filter(Boolean);
+    const join = (arr) => (arr.length <= 1 ? arr[0] || "" : arr.slice(0, -1).join(", ") + " & " + arr[arr.length - 1]);
     return {
-      linkedin, linkedinWeek: Math.round(linkedin / 4),
-      calls, callsDay: Math.max(1, Math.round(calls / C.benchmarks.workingDaysPerMonth)),
+      ...base,
+      industry: ind.name,
+      firmo: [size && `${size} employees`, join(markets)].filter(Boolean).join(" · "),
+      roles: profile.titles,
     };
   }
 
-  // ---- Shareable plan link: everything needed to rebuild the plan, kept short.
+  // Kept for older callers.
+  const SEQUENCE = [];
+  function channelPlan(o) {
+    const linkedin = Math.min(o.prospects, 400), calls = Math.round(o.prospects * 0.15);
+    return { linkedin, linkedinWeek: Math.round(linkedin / 4), calls, callsDay: Math.max(1, Math.round(calls / C.benchmarks.workingDaysPerMonth)) };
+  }
+
+  // ---- Shareable plan link -------------------------------------------------
+  // Compact code so the shared link stays short:
+  //   #1~Company~domain~industry~markets~sizes~roles~volume~contacts~companies~colour
+  // Lists are bitmasks in base 36; numbers are base 36. Old "c=…&i=…" links still decode.
+  const b36 = (n) => Math.round(n).toString(36);
+  const mask = (all, picked) => b36(all.reduce((m, x, i) => (picked.includes(x) ? m | (1 << i) : m), 0));
+  const unmask = (all, v) => { const n = parseInt(v || "0", 36) || 0; return all.filter((_, i) => n & (1 << i)); };
+  const enc = (v) => encodeURIComponent(v || "").replace(/%20/g, "_").replace(/~/g, "%7E");
+  const dec = (v) => decodeURIComponent((v || "").replace(/_/g, " "));
   function encodePlan({ profile, prospects, market }) {
     const ind = industryById(profile.industryId);
-    const q = new URLSearchParams();
-    if (profile.companyName) q.set("c", profile.companyName);
-    if (profile.domain) q.set("d", profile.domain);
-    q.set("i", profile.industryId);
-    q.set("g", profile.geos.join("."));
-    q.set("s", profile.sizes.join("."));
-    q.set("t", profile.titles.map((t) => ind.titles.indexOf(t)).filter((x) => x >= 0).join("."));
-    q.set("p", String(prospects));
-    if (market) q.set("m", `${market.contacts}.${market.companies}`);
-    if (profile.brandColor) q.set("k", profile.brandColor.replace("#", ""));
-    return q.toString();
+    return [
+      "1", enc(profile.companyName), enc(profile.domain),
+      b36(D.industries.indexOf(ind)),
+      mask(D.geos.map((g) => g.id), profile.geos),
+      mask(D.sizes.map((s) => s.id), profile.sizes),
+      mask(ind.titles, profile.titles),
+      b36(Math.max(0, C.benchmarks.volumeOptions.indexOf(prospects))),
+      market ? b36(market.contacts) : "", market ? b36(market.companies) : "",
+      (profile.brandColor || "").replace("#", ""),
+    ].join("~").replace(/~+$/, "");
   }
   function decodePlan(str) {
-    const q = new URLSearchParams(str.replace(/^[#?]/, ""));
+    const raw = String(str || "").replace(/^[#?]/, "");
+    if (raw.startsWith("1~")) {
+      const f = raw.split("~");
+      const ind = D.industries[parseInt(f[3], 36)];
+      if (!ind) return null;
+      const geos = unmask(D.geos.map((g) => g.id), f[4]);
+      const sizes = unmask(D.sizes.map((s) => s.id), f[5]);
+      const titles = unmask(ind.titles, f[6]);
+      const k = (f[10] || "").toLowerCase();
+      return {
+        profile: {
+          companyName: dec(f[1]), domain: dec(f[2]), industryId: ind.id, offering: ind.offering,
+          geos: geos.length ? geos : ind.defaultGeos.slice(), sizes: sizes.length ? sizes : D.defaultSizes.slice(),
+          titles: titles.length ? titles : ind.titles.slice(),
+          brandColor: /^[0-9a-f]{6}$/.test(k) ? "#" + k : "",
+        },
+        prospects: C.benchmarks.volumeOptions[parseInt(f[7] || "0", 36)] || C.benchmarks.defaultProspects,
+        market: f[8] ? { contacts: parseInt(f[8], 36), companies: parseInt(f[9] || "0", 36) } : null,
+      };
+    }
+    // Older links: plan.html#c=…&d=…&i=…
+    const q = new URLSearchParams(raw);
     const ind = D.industries.find((x) => x.id === q.get("i"));
     if (!ind) return null;
     const pickList = (v, valid) => (v || "").split(".").filter((x) => valid.includes(x));
@@ -320,7 +419,7 @@ window.SH_API = (function () {
   }
 
   return {
-    SEQUENCE, channelPlan, encodePlan, decodePlan,
+    buildStrategy, buildIcp, SEQUENCE, channelPlan, encodePlan, decodePlan,
     prettyName: (domain) => prettyCompanyName(cleanDomain(domain)),
     leadFinderUrl, outreach,
     looksLikeDomain, cleanDomain, industryById,

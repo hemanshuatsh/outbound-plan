@@ -40,6 +40,11 @@
 .pl-hero.branded::before { content: ""; position: absolute; inset: -40px -24px auto; height: 220px; background: linear-gradient(180deg, color-mix(in srgb, var(--brand) 14%, transparent), transparent); border-radius: 0 0 28px 28px; z-index: -1; }
 .pl-hero.branded .pl-lockup .brand-mark:first-child { border-color: color-mix(in srgb, var(--brand) 45%, transparent); }
 
+.pl-value { max-width: 640px; }
+.pl-value .est { background: var(--primary-50); border: 1px solid var(--primary-100); border-radius: 18px; padding: 20px; }
+.pl-reach small { display: block; font-size: 12px; font-weight: 600; color: var(--muted-2); margin-bottom: 6px; text-align: right; }
+@media (max-width: 600px) { .pl-reach small { text-align: left; } .pl-hero.branded::before { left: -16px; right: -16px; } }
+
 /* Print / Save as PDF */
 @media print {
   .plan-page .topbar, .pl-actions-top, #volume, #top-cta { display: none !important; }

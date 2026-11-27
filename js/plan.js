@@ -34,7 +34,7 @@
   const p = S.profile, ind = API.industryById(p.industryId);
   const geoNames = p.geos.map((g) => D.geos.find((x) => x.id === g)?.name);
   const lfUrl = API.leadFinderUrl(p);
-  const title = `${p.companyName ? p.companyName + "'s" : "Your"} 30-day outbound plan`;
+  const title = p.companyName ? `${/s$/i.test(p.companyName) ? p.companyName + "'" : p.companyName + "'s"} 30-day outbound plan` : `30-day outbound plan for ${ind.name}`;
   if (p.brandColor) document.documentElement.style.setProperty("--brand", p.brandColor);
   const logoSrc = p.domain ? `https://www.google.com/s2/favicons?domain=${encodeURIComponent(p.domain)}&sz=128` : "";
   function brandMark() {
@@ -58,7 +58,7 @@
   }
 
   function render() {
-    const o = API.outreach({ prospects: S.prospects }), cp = API.channelPlan(o), seq = API.SEQUENCE, m = S.market;
+    const o = API.outreach({ prospects: S.prospects }), m = S.market, st = API.buildStrategy(p, o), V = window.SH_VIEWS;
     const chan = (key, name, role, text, when, volume) => `
       <div class="card chan">
         <div class="chan-head"><span class="chan-ic c-${key}">${I(CH_ICON[key], 18)}</span><div><small>${role}</small><b>${name}</b></div></div>
@@ -69,7 +69,6 @@
       <section class="screen plan-wrap">
         <div class="pl-hero ${p.brandColor ? "branded" : ""}">
           <div class="pl-lockup">${brandMark()}<span class="x">×</span><span class="brand-mark sh" style="width:56px;height:56px"><img src="assets/favicon.svg" alt="Saleshandy" /></span></div>
-          <span class="eyebrow">${I("sparkles", 13)} Built with Saleshandy at ${esc(C.event.name)}</span>
           <h1>${esc(title)}</h1>
           <p class="sub">A multichannel outbound plan for ${esc(ind.name)}: who to reach, what it can bring in, and how it runs.</p>
           <div class="row pl-actions-top">
@@ -81,22 +80,17 @@
         <div class="pl-section">
           <div class="pl-title-row">
             <div><span class="eyebrow">1 · The value</span><h2 class="pl-h2">What this can bring in every month</h2></div>
-            <div class="pills" id="volume" title="New leads per month">${B.volumeOptions.map((v) => `<button data-v="${v}" class="${S.prospects === v ? "on" : ""}">${fmtInt(v)}</button>`).join("")}</div>
+            <div class="pl-reach"><small>People reached a month</small><div class="pills" id="volume">${B.volumeOptions.map((v) => `<button data-v="${v}" class="${S.prospects === v ? "on" : ""}">${fmtInt(v)}</button>`).join("")}</div></div>
           </div>
-          <div class="journey j5">
-            <div class="jstep"><div class="jtop"><span class="jn">1</span><span class="jic">${I("send", 18)}</span></div><div class="v num">${fmtInt(o.prospects)}</div><div class="k">Leads you reach</div><p>Fresh decision makers from Lead Finder, about ${fmtInt(o.prospectsPerDay)} a day</p></div>
-            <div class="jstep"><div class="jtop"><span class="jn">2</span><span class="jic">${I("message", 18)}</span></div><div class="v num">~${rng(o.replies)}</div><div class="k">Replies</div><p>~${pct(B.replyRateRange[0])}–${pct(B.replyRateRange[1])} of people reply</p></div>
-            <div class="jstep pos"><div class="jtop"><span class="jn">3</span><span class="jic">${I("sparkles", 18)}</span></div><div class="v num">~${rng(o.positiveReplies)}</div><div class="k">Positive replies</div><p>~${Math.round(B.positiveShare * 100)}% of replies want to talk</p></div>
-            <div class="jstep"><div class="jtop"><span class="jn">4</span><span class="jic">${I("calendar", 18)}</span></div><div class="v num">~${rng(o.meetings)}</div><div class="k">Meetings</div><p>~${Math.round(B.meetingShare * 100)}% book a meeting</p></div>
-            <div class="jstep win"><div class="jtop"><span class="jn">5</span><span class="jic">${I("trendingUp", 18)}</span></div><div class="v num">~${rng(o.clients)}</div><div class="k">New clients</div><p>~${Math.round(B.clientShare * 100)}% of meetings become clients</p></div>
+          <div class="pl-value">
+            ${V.estimate(o, { who: "you" })}
+            <p class="est-day">${I("clock", 15)} <span>Saves about <b>${fmtInt(o.hours)} hours</b> of manual prospecting a month, the work of ~${oneDp(o.sdrs)} full-time reps.</span></p>
           </div>
-          <p class="j-est">Estimate: ~${pct(B.replyRateRange[0])} to ${pct(B.replyRateRange[1])} reply, ~${Math.round(B.positiveShare * 100)}% positive, ~${Math.round(B.meetingShare * 100)}% meet, ~${Math.round(B.clientShare * 100)}% buy. Yours can be better.</p>
-          <div class="pl-note">${I("clock", 16)} <span>Saves about <b>${fmtInt(o.hours)} hours</b> of manual prospecting a month, the work of <b>${oneDp(o.sdrs)} full-time reps</b>.</span></div>
         </div>
 
         <div class="pl-section">
-          <span class="eyebrow">2 · The market</span>
-          <h2 class="pl-h2">Who you'll reach</h2>
+          <span class="eyebrow">2 · Who to target</span>
+          <h2 class="pl-h2">Who ${p.companyName ? esc(p.companyName) + " should" : "to"} target, and who not</h2>
           <div class="pl-market">
             <div class="pl-kpi blue"><span>${I("users", 16)} Decision makers</span><b class="num">${fmtCompact(m.contacts)}</b></div>
             <div class="pl-kpi"><span>${I("building", 16)} Companies</span><b class="num">${fmtCompact(m.companies)}</b></div>
@@ -104,36 +98,26 @@
               <div><small>Roles</small><b>${esc(listJoin(p.titles))}</b></div>
               <div><small>Markets</small><b>${esc(listJoin(geoNames))}</b></div>
               <div><small>Company size</small><b>${esc(sizeRange())} employees</b></div>
-              <div><small>Industries</small><b>${esc(listJoin(ind.buyers.slice(0, 3)))}</b></div>
+              <div><small>Industry</small><b>${esc(ind.name)}</b></div>
             </div>
           </div>
+          <div style="margin-top:14px">${V.icp(API.buildIcp(p))}</div>
         </div>
 
         <div class="pl-section">
-          <span class="eyebrow">3 · The process</span>
-          <h2 class="pl-h2">How the first <mark>30 days</mark> run</h2>
-          <div class="timeline" style="margin-top:6px">
-            <div class="tl"><div class="dot">${I("zap", 20)}</div><div class="day">Day 1</div><h3>Set up</h3><p>${o.mailboxes} mailboxes on ${o.domains} domains, configured in about 10 minutes.</p></div>
-            <div class="tl"><div class="dot">${I("flame", 20)}</div><div class="day">Day 1–${B.warmupDays}</div><h3>Warm up</h3><p>Mailboxes build sender reputation automatically, so emails land in the inbox.</p></div>
-            <div class="tl"><div class="dot">${I("rocket", 20)}</div><div class="day">Day ${B.warmupDays + 1}</div><h3>Launch</h3><p>The sequence starts reaching ${fmtInt(o.prospectsPerDay)} new prospects every working day.</p></div>
-            <div class="tl"><div class="dot">${I("calendar", 20)}</div><div class="day">Day ${B.warmupDays + 6}+</div><h3>Book meetings</h3><p>Replies from every channel land in one inbox. The team replies and books.</p></div>
-          </div>
-        </div>
-
-        <div class="pl-section">
-          <span class="eyebrow">4 · The strategy</span>
-          <h2 class="pl-h2">One sequence, four channels</h2>
-          <div class="channels-grid">
-            ${chan("email", "Email", "Main channel", `AI-personalised emails from ${o.mailboxes} warmed-up mailboxes, sent automatically.`, "Day 1, 4 & 11", `${fmtInt(o.prospects)} prospects, ${B.emailsPerProspect} emails each`)}
-            ${chan("linkedin", "LinkedIn", "Warm-up touch", "Connect with best-fit decision makers so the name is familiar before the follow-up.", "Day 2, message on Day 8", `${fmtInt(cp.linkedin)} requests / month`)}
-            ${chan("call", "Calls", "Built-in dialer", "Call the prospects who opened or clicked. Warm calls, not cold ones.", "Day 6", `~${cp.callsDay} calls a day`)}
-            ${chan("whatsapp", "WhatsApp", "Close the loop", "Confirm meetings with interested prospects, faster.", "Day 14, or on reply", `~${rng(o.positiveReplies)} conversations / month`)}
-          </div>
-          <div class="card" style="margin-top:14px"><div class="seq">${seq.map((s) => `<div class="seq-step"><div class="dot c-${s.ch}">${I(CH_ICON[s.ch], 18)}</div><div class="day">Day ${s.day}</div><div class="what">${esc(s.what)}</div></div>`).join("")}</div></div>
+          <span class="eyebrow">3 · How to reach them</span>
+          <h2 class="pl-h2">Your outbound strategy</h2>
+          ${V.strategy(st)}
           <div class="card disclosure ${S.emailOpen ? "open" : ""}" style="margin-top:14px">
             <button data-act="email"><span class="ai-tag">${I("sparkles", 13)} AI Copilot</span> See a sample first email<span class="chev">${I("chevronDown", 18)}</span></button>
             ${S.emailOpen ? `<div class="body" id="email-body">Writing…</div>` : ""}
           </div>
+        </div>
+
+        <div class="pl-section">
+          <span class="eyebrow">4 · The first 30 days</span>
+          <h2 class="pl-h2">How the first <mark>30 days</mark> run</h2>
+          ${V.timeline(o, st)}
         </div>
 
         <div class="pl-final">
