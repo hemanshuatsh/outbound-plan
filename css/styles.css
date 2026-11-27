@@ -507,9 +507,10 @@ table.leads td:nth-child(2) b, table.leads td:nth-child(2) small, table.leads td
 }
 
 /* ---------- Live logo preview while typing the website ---------- */
-.hero-form .pre { width: 40px; height: 40px; place-items: center; border-radius: 10px; transition: background .2s; }
+.hero-form .pre { flex: 0 0 40px; width: 40px; height: 40px; padding: 0; margin-left: 6px; box-sizing: border-box; place-items: center; border-radius: 10px; transition: background .2s; }
+.hero-form .pre > * { grid-area: 1 / 1; }
 .hero-form .pre.has-logo { background: #fff; border: 1px solid var(--line-2); }
-.hero-form .pre img { width: 26px; height: 26px; object-fit: contain; animation: pop .3s ease both; }
+.hero-form .pre img { display: block; width: 24px; height: 24px; object-fit: contain; animation: pop .3s ease both; }
 @keyframes pop { from { transform: scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
 .url-preview { display: flex; justify-content: center; align-items: center; gap: 8px; min-height: 28px; margin-top: 12px; font-size: 15px; color: var(--muted); opacity: 0; transition: opacity .2s; }
 .url-preview.show { opacity: 1; }

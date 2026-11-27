@@ -92,7 +92,7 @@
       </div>`;
     root.innerHTML = `
       <section class="screen plan-wrap">
-        <div class="pl-hero ${p.brandColor ? "branded" : ""}">
+        <div class="pl-hero branded">
           <div class="pl-lockup">${brandMark()}<span class="x">×</span><span class="brand-mark sh" style="width:56px;height:56px"><img src="assets/favicon.svg" alt="Saleshandy" /></span></div>
           <h1>${esc(title)}</h1>
           <p class="sub">A multichannel outbound plan for ${esc(ind.name)}: who to reach, what it can bring in, and how it runs.</p>
@@ -103,25 +103,20 @@
         </div>
 
         <div class="pl-section">
-          <div class="pl-title-row">
-            <div><span class="eyebrow">1 · The value</span><h2 class="pl-h2">What this can bring in every month</h2></div>
-            <div class="pl-reach"><small>People reached a month</small><div class="pills" id="volume">${B.volumeOptions.map((v) => `<button data-v="${v}" class="${S.prospects === v ? "on" : ""}">${fmtInt(v)}</button>`).join("")}</div></div>
-          </div>
-          <div class="pl-value">
-            ${V.estimate(o, { who: "you" })}
-            <p class="est-day">${I("clock", 15)} <span>Saleshandy automates about <b>${fmtInt(o.hours)} hours</b> of manual prospecting a month, the work of ~${oneDp(o.sdrs)} full-time reps.</span></p>
-          </div>
+          <span class="eyebrow">1 · The value</span>
+          <h2 class="pl-h2">What this can bring in every month</h2>
+          ${valuePanel(o)}
         </div>
 
         <div class="pl-section">
           <span class="eyebrow">2 · Who to target</span>
           <h2 class="pl-h2">Who ${p.companyName ? esc(p.companyName) + " should" : "to"} target, and who not</h2>
           <div class="pl-market">
-            <div class="pl-kpi blue"><span>${I("users", 16)} Decision makers</span><b class="num">${fmtCompact(m.contacts)}</b></div>
-            <div class="pl-kpi"><span>${I("building", 16)} Companies</span><b class="num">${fmtCompact(m.companies)}</b></div>
+            <div class="pl-kpi blue"><span>${I("users", 16)} People you can sell to</span><div><b class="num">${fmtCompact(m.contacts)}</b><p>The people who say yes to a purchase</p></div></div>
+            <div class="pl-kpi"><span>${I("building", 16)} Companies that could buy</span><div><b class="num">${fmtCompact(m.companies)}</b><p>About ${Math.max(1, Math.round(m.contacts / Math.max(1, m.companies)))} people to talk to at each</p></div></div>
             <div class="pl-icp">
               <div><small>Roles</small><b>${esc(currentIcp()?.ai ? currentIcp().champion : listJoin(p.titles))}</b></div>
-              <div><small>Markets</small><b>${esc(listJoin(geoNames))}</b></div>
+              <div><small>Markets</small><b>${esc(geoNames.join(", "))}</b></div>
               <div><small>Company size</small><b>${esc(sizeRange())} employees</b></div>
               <div><small>${currentIcp()?.ai ? "Buyers" : "Industry"}</small><b>${esc(currentIcp()?.ai ? listJoin(currentIcp().segments.map((x) => x[0])) : ind.name)}</b></div>
             </div>
@@ -158,6 +153,49 @@
       </section>`;
     bind();
     if (S.emailOpen) fillEmail();
+  }
+
+  // The value: pick a reach → see the answer → see how it narrows down (public plan only).
+  function valuePanel(o) {
+    const pctR = (r) => `${pct(r[0])}–${pct(r[1])}`;
+    const whole = (x) => Math.round(x * 100) + "%";
+    const steps = [
+      { n: fmtInt(o.prospects), label: "People you reach", hint: "By email, LinkedIn and calls", rate: "Your list", h: 100 },
+      { n: `~${rng(o.replies)}`, label: "Reply", hint: "All in one inbox", rate: `${pctR(B.replyRateRange)} reply`, h: 74 },
+      { n: `~${rng(o.positiveReplies)}`, label: "Are interested", hint: "Want to hear more", rate: `${whole(B.positiveShare)} of replies`, h: 54 },
+      { n: `~${rng(o.meetings)}`, label: "Book a meeting", hint: "A call on your calendar", rate: `${whole(B.meetingShare)} of interested`, h: 40 },
+      { n: `~${rng(o.clients)}`, label: "Become clients", hint: "New paying customers", rate: `${whole(B.clientShare)} of meetings`, h: 30, win: true },
+    ];
+    return `
+      <div class="vp">
+        <div class="vp-pick">
+          <span class="vp-q">If you reach<span class="vp-m"> this many people a month</span></span>
+          <div class="pills vp-pills" id="volume" role="group" aria-label="People reached a month">${B.volumeOptions.map((v) => `<button data-v="${v}" class="${S.prospects === v ? "on" : ""}" aria-pressed="${S.prospects === v}">${fmtInt(v)}</button>`).join("")}</div>
+          <span class="vp-q vp-tail">people a month</span>
+        </div>
+        <div class="vp-answer">
+          <div class="vp-main">
+            <small>You can win</small>
+            <b class="num"><mark>~${rng(o.clients)}</mark></b>
+            <span>new clients every month</span>
+          </div>
+          <div class="vp-facts">
+            <div><b class="num">~${rng(o.meetings)}</b><span>meetings booked a month</span></div>
+            <div><b class="num">${fmtInt(o.hours)} hrs</b><span>of manual work automated, like ~${oneDp(o.sdrs)} full-time reps</span></div>
+          </div>
+        </div>
+        <div class="vp-funnel" aria-label="How it narrows down">
+          ${steps.map((x, i) => `
+          <div class="vf ${x.win ? "win" : ""}" style="--h:${x.h}%">
+            <span class="vf-rate">${i ? I("arrowRight", 12) : ""}${esc(x.rate)}</span>
+            <div class="vf-bar"><span></span></div>
+            <b class="num">${x.n}</b>
+            <span class="vf-l">${esc(x.label)}</span>
+            <small>${esc(x.hint)}</small>
+          </div>`).join("")}
+        </div>
+        <p class="vp-note">${I("chart", 14)} Based on typical cold outreach: ${pctR(B.replyRateRange)} reply, ${whole(B.positiveShare)} of replies are interested, ${whole(B.meetingShare)} of those meet, ${whole(B.clientShare)} of meetings buy. Good targeting can do better.</p>
+      </div>`;
   }
 
   async function fillEmail() {

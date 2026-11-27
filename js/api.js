@@ -303,7 +303,7 @@ window.SH_API = (function () {
 
     const name = ["Email", "LinkedIn", highValue && "Calls", whatsappCold && "WhatsApp"].filter(Boolean).join(" + ");
     const why = [
-      "LinkedIn warms up decision makers before and between emails.",
+      "LinkedIn warms up the people who buy before and between emails.",
       highValue ? `Deals of this size justify a short call, but only to prospects who opened twice or more.` : "Deal sizes here suit a lighter, volume-friendly mix, so no cold calls.",
       whatsappCold ? `WhatsApp is a normal business channel in ${waMarkets.join(" & ")}, so it's used as a final check-in.` : "WhatsApp is kept for after someone replies, since cold WhatsApp doesn't suit these markets.",
     ];
